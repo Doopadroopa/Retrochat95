@@ -511,7 +511,7 @@
         <!-- Main Chat Window -->
         <div class="window chat-window" id="chatWindow">
             <div class="title-bar" id="chatTitleBar">
-                <div class="title-bar-text">RetroChatRoom 95</div>
+                <div class="title-bar-text">RetroChat95</div>
                 <div class="title-bar-controls">
                     <button onclick="minimizeWindow('chatWindow')">_</button>
                     <button onclick="closeWindow('chatWindow')">X</button>
@@ -550,22 +550,20 @@
                                 SYSTEM <span class="timestamp">[00:00]</span>
                             </div>
                             <div class="message-content">
-                                Welcome to RetroChatRoom 95! The kewlest chat on the information superhighway.
+                                Welcome to RetroChat95! The kewlest chat on the internet!
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="typing-indicator" id="typingIndicator"></div>
-
-                <div class="input-area">
-                    <label class="file-input-label">
-                        <button>Image</button>
-                        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
-                    </label>
-                    <input type="text" id="messageInput" placeholder="Type your message here..." maxlength="500">
-                    <button onclick="sendMessage()">SEND</button>
-                </div>
+                
+<div class="input-area">
+    <button onclick="document.getElementById('imageInput').click()">Image</button>
+    <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" style="display:none;">
+    <input type="text" id="messageInput" placeholder="Type your message here..." maxlength="500">
+    <button onclick="sendMessage()">SEND</button>
+</div>
 
                 <div class="status-bar">
                     <span id="statusText">Connected</span>
