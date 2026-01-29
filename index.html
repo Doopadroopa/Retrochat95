@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetroChatRoom 95</title>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            background: #008080;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .desktop {
+            height: 100vh;
+            position: relative;
+            padding: 10px;
+        }
+
+        .desktop-icon {
+            width: 80px;
+            text-align: center;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .desktop-icon-image {
+            width: 50px;
+            height: 50px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            margin: 0 auto 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .desktop-icon-label {
+            color: white;
+            font-size: 12px;
+            text-shadow: 1px 1px 2px black;
+            word-wrap: break-word;
+        }
+
+        .desktop-icon:active .desktop-icon-image {
+            border-color: #000000 #ffffff #ffffff #000000;
+        }
+
+        .window {
+            position: absolute;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .window.active {
+            display: block;
+            z-index: 100;
+        }
+
+        .title-bar {
+            background: linear-gradient(to right, #000080, #1084d0);
+            color: white;
+            padding: 3px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            cursor: move;
+        }
+
+        .title-bar-text {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .title-bar-controls {
+            display: flex;
+            gap: 2px;
+        }
+
+        .title-bar-controls button {
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            padding: 0;
+            font-weight: bold;
+        }
+
+        .window-body {
+            padding: 10px;
+            background: #c0c0c0;
+        }
+
+        button {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            padding: 5px 15px;
+            font-family: 'Comic Sans MS', cursive;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:active {
+            border-color: #000000 #ffffff #ffffff #000000;
+        }
+
+        .chat-window {
+            width: 700px;
+            height: 500px;
+            top: 50px;
+            left: 50px;
+        }
+
+        .menu-bar {
+            background: #c0c0c0;
+            border-bottom: 2px solid #808080;
+            display: flex;
+            gap: 5px;
+            padding: 2px;
+        }
+
+        .menu-item {
+            padding: 4px 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background: #000080;
+            color: white;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            min-width: 150px;
+            z-index: 1000;
+        }
+
+        .dropdown.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 5px 20px;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #000080;
+            color: white;
+        }
+
+        .chat-container {
+            display: flex;
+            height: 380px;
+            gap: 10px;
+        }
+
+        .users-panel {
+            width: 150px;
+            border: 2px inset #808080;
+            background: white;
+            padding: 5px;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            padding: 3px;
+            margin: 2px 0;
+            background: #c0c0c0;
+            border: 1px solid #808080;
+            font-size: 13px;
+        }
+
+        .user-item.online::before {
+            content: "● ";
+            color: #00ff00;
+        }
+
+        .messages-area {
+            flex: 1;
+            border: 2px inset #808080;
+            background: white;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            word-wrap: break-word;
+        }
+
+        .message-header {
+            font-weight: bold;
+            color: #000080;
+            margin-bottom: 2px;
+        }
+
+        .timestamp {
+            color: #808080;
+            font-size: 11px;
+        }
+
+        .message-content {
+            color: #000000;
+            margin-left: 10px;
+        }
+
+        .message-image {
+            max-width: 300px;
+            margin: 5px 0;
+            border: 2px solid #808080;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+
+        .input-area {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 5px;
+            border: 2px inset #808080;
+            font-family: 'Comic Sans MS', cursive;
+            font-size: 14px;
+        }
+
+        .file-input-label {
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .status-bar {
+            background: #c0c0c0;
+            border-top: 2px solid #ffffff;
+            padding: 2px 5px;
+            font-size: 11px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .login-window {
+            width: 400px;
+            height: 250px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .form-group input {
+            padding: 8px;
+            border: 2px inset #808080;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .about-window {
+            width: 450px;
+            height: 300px;
+            top: 100px;
+            left: 150px;
+        }
+
+        .about-content {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .about-content h1 {
+            color: #000080;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .about-content p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: #c0c0c0;
+            border-top: 2px solid #ffffff;
+            display: flex;
+            align-items: center;
+            padding: 2px;
+            gap: 5px;
+        }
+
+        .start-button {
+            height: 32px;
+            padding: 0 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .start-menu {
+            display: none;
+            position: absolute;
+            bottom: 42px;
+            left: 2px;
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            min-width: 200px;
+            z-index: 1000;
+        }
+
+        .start-menu.show {
+            display: block;
+        }
+
+        .start-menu-item {
+            padding: 8px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #808080;
+        }
+
+        .start-menu-item:hover {
+            background: #000080;
+            color: white;
+        }
+
+        .start-menu-separator {
+            height: 2px;
+            background: #808080;
+            margin: 2px 0;
+        }
+
+        .window-button {
+            height: 32px;
+            padding: 0 15px;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .clock {
+            margin-left: auto;
+            padding: 0 10px;
+            border: 2px inset #808080;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .settings-window {
+            width: 400px;
+            height: 350px;
+            top: 120px;
+            left: 200px;
+        }
+
+        .settings-content {
+            padding: 15px;
+        }
+
+        .setting-item {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setting-item label {
+            flex: 1;
+        }
+
+        select {
+            padding: 5px;
+            border: 2px inset #808080;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        input[type="color"] {
+            width: 50px;
+            height: 30px;
+            border: 2px inset #808080;
+            cursor: pointer;
+        }
+
+        input[type="range"] {
+            flex: 1;
+        }
+
+        .typing-indicator {
+            font-style: italic;
+            color: #808080;
+            font-size: 12px;
+            margin: 5px 0;
+        }
+
+        .notification {
+            position: fixed;
+            top: 50px;
+            right: 50px;
+            background: #ffffcc;
+            border: 2px solid #000000;
+            padding: 15px;
+            max-width: 300px;
+            display: none;
+            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        .notification.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .pixel-canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop">
+        <!-- Desktop Icon -->
+        <div class="desktop-icon" ondblclick="openChatWindow()">
+            <div class="desktop-icon-image">💬</div>
+            <div class="desktop-icon-label">RetroChatRoom 95</div>
+        </div>
+
+        <!-- Login Window -->
+        <div class="window login-window active" id="loginWindow">
+            <div class="title-bar">
+                <div class="title-bar-text">Welcome to RetroChatRoom 95</div>
+            </div>
+            <div class="window-body">
+                <div class="login-form">
+                    <div class="form-group">
+                        <label>Enter Your Username:</label>
+                        <input type="text" id="usernameInput" placeholder="CoolDude123" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label>Choose Your Color:</label>
+                        <input type="color" id="userColor" value="#ff00ff">
+                    </div>
+                    <button onclick="login()" style="margin-top: 20px; padding: 10px;">Enter the Chat</button>
+                    <p style="text-align: center; margin-top: 10px; font-size: 12px; color: #808080;">
+                        Be kewl, be kind
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Window -->
+        <div class="window chat-window" id="chatWindow">
+            <div class="title-bar" id="chatTitleBar">
+                <div class="title-bar-text">RetroChatRoom 95</div>
+                <div class="title-bar-controls">
+                    <button onclick="minimizeWindow('chatWindow')">_</button>
+                    <button onclick="closeWindow('chatWindow')">X</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="menu-bar">
+                    <div class="menu-item" onclick="toggleDropdown('fileMenu')">
+                        File
+                        <div class="dropdown" id="fileMenu">
+                            <div class="dropdown-item" onclick="showSettings()">Settings</div>
+                            <div class="dropdown-item" onclick="clearChat()">Clear Chat</div>
+                            <div class="dropdown-item" onclick="exportChat()">Export Chat</div>
+                        </div>
+                    </div>
+                    <div class="menu-item" onclick="toggleDropdown('helpMenu')">
+                        Help
+                        <div class="dropdown" id="helpMenu">
+                            <div class="dropdown-item" onclick="showAbout()">About</div>
+                            <div class="dropdown-item" onclick="showHelp()">How to Use</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-container">
+                    <div class="users-panel">
+                        <div style="font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #000;">
+                            ONLINE USERS
+                        </div>
+                        <div id="usersList"></div>
+                    </div>
+
+                    <div class="messages-area" id="messagesArea">
+                        <div class="message">
+                            <div class="message-header">
+                                SYSTEM <span class="timestamp">[00:00]</span>
+                            </div>
+                            <div class="message-content">
+                                Welcome to RetroChatRoom 95! The kewlest chat on the information superhighway.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator"></div>
+
+                <div class="input-area">
+                    <label class="file-input-label">
+                        <button>Image</button>
+                        <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+                    </label>
+                    <input type="text" id="messageInput" placeholder="Type your message here..." maxlength="500">
+                    <button onclick="sendMessage()">SEND</button>
+                </div>
+
+                <div class="status-bar">
+                    <span id="statusText">Connected</span>
+                    <span id="messageCount">Messages: 1</span>
+                    <span id="userCount">Users: 1</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Window -->
+        <div class="window about-window" id="aboutWindow">
+            <div class="title-bar">
+                <div class="title-bar-text">About RetroChatRoom 95</div>
+                <div class="title-bar-controls">
+                    <button onclick="closeWindow('aboutWindow')">X</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="about-content">
+                    <h1>RetroChatRoom 95</h1>
+                    <p><strong>Version:</strong> 1.0</p>
+                    <p><strong>Year:</strong> 2026 (with 1995 vibes)</p>
+                    <p>The kewlest chat experience on the web.</p>
+                    <p>Features:</p>
+                    <p>Auto-pixelated images<br>
+                    Custom colors<br>
+                    Real-time chat<br>
+                    Maximum 90s nostalgia</p>
+                    <button onclick="closeWindow('aboutWindow')" style="margin-top: 15px;">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Window -->
+        <div class="window settings-window" id="settingsWindow">
+            <div class="title-bar">
+                <div class="title-bar-text">Settings</div>
+                <div class="title-bar-controls">
+                    <button onclick="closeWindow('settingsWindow')">X</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <label>Your Color:</label>
+                        <input type="color" id="settingsColor" value="#ff00ff" onchange="updateUserColor(this.value)">
+                    </div>
+                    <div class="setting-item">
+                        <label>Window Border Color:</label>
+                        <input type="color" id="borderColor" value="#000080" onchange="updateBorderColor(this.value)">
+                    </div>
+                    <div class="setting-item">
+                        <label>Sound Effects:</label>
+                        <select id="soundToggle">
+                            <option value="on">ON</option>
+                            <option value="off">OFF</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Notifications:</label>
+                        <select id="notifToggle">
+                            <option value="on">ON</option>
+                            <option value="off">OFF</option>
+                        </select>
+                    </div>
+                    <div class="setting-item">
+                        <label>Pixelation Level:</label>
+                        <input type="range" id="pixelLevel" min="1" max="10" value="5">
+                        <span id="pixelValue">5</span>
+                    </div>
+                    <div class="setting-item">
+                        <label>Username:</label>
+                        <input type="text" id="settingsUsername" placeholder="Your Username">
+                    </div>
+                    <button onclick="saveSettings()" style="margin-top: 20px; width: 100%;">SAVE SETTINGS</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification -->
+        <div class="notification" id="notification">
+            <div style="font-weight: bold; margin-bottom: 5px;">New Message</div>
+            <div id="notificationText"></div>
+        </div>
+
+        <!-- Taskbar -->
+        <div class="taskbar">
+            <button class="start-button" onclick="toggleStartMenu()">Start</button>
+            <div class="start-menu" id="startMenu">
+                <div class="start-menu-item" onclick="showSettings(); toggleStartMenu();">Settings</div>
+                <div class="start-menu-item" onclick="showHelp(); toggleStartMenu();">Help</div>
+                <div class="start-menu-item" onclick="showAbout(); toggleStartMenu();">About</div>
+                <div class="start-menu-separator"></div>
+                <div class="start-menu-item" onclick="clearChat(); toggleStartMenu();">Clear Chat</div>
+                <div class="start-menu-item" onclick="exportChat(); toggleStartMenu();">Export Chat</div>
+            </div>
+            <button class="window-button" onclick="focusWindow('chatWindow')">RetroChatRoom 95</button>
+            <div class="clock" id="clock">12:00 PM</div>
+        </div>
+    </div>
+
+    <canvas id="pixelCanvas" class="pixel-canvas"></canvas>
+
+    <script>
+        // Socket.IO Connection
+        // IMPORTANT: Replace this URL with your Railway deployment URL after deploying!
+        // For local testing, use: const socket = io('http://localhost:3000');
+        // For production, use: const socket = io('https://your-app-name.up.railway.app');
+        const socket = io(); // This will auto-connect to the same domain when deployed
+
+        let currentUser = '';
+        let userColor = '#ff00ff';
+        let messages = [];
+        let users = []; // Will be populated by backend
+        let messageCount = 1;
+        let pixelationLevel = 5;
+        let typingTimeout;
+
+        // Clock
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours() % 12 || 12;
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+            document.getElementById('clock').textContent = `${hours}:${minutes} ${ampm}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Login
+        function login() {
+            const username = document.getElementById('usernameInput').value.trim();
+            if (!username) {
+                alert('You need a username to enter!');
+                return;
+            }
+            currentUser = username;
+            userColor = document.getElementById('userColor').value;
+            
+            // Send login info to server
+            socket.emit('user-login', {
+                username: currentUser,
+                color: userColor
+            });
+            
+            document.getElementById('loginWindow').classList.remove('active');
+            document.getElementById('chatWindow').classList.add('active');
+            
+            showNotification(`Welcome, ${currentUser}!`);
+        }
+
+        // Send Message
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const now = new Date();
+            const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            // Send to server
+            socket.emit('chat-message', {
+                message: message,
+                timestamp: time
+            });
+            
+            input.value = '';
+            
+            // Stop typing indicator
+            socket.emit('stop-typing');
+        }
+
+        // Add Message
+        function addMessage(username, text, color, timestamp) {
+            const messagesArea = document.getElementById('messagesArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            // Use provided timestamp or generate new one
+            const time = timestamp || (() => {
+                const now = new Date();
+                return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            })();
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <span style="color: ${color};">${username}</span>
+                    <span class="timestamp">[${time}]</span>
+                </div>
+                <div class="message-content">${text}</div>
+            `;
+            
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            
+            messageCount++;
+            document.getElementById('messageCount').textContent = `Messages: ${messageCount}`;
+            
+            if (username !== currentUser) {
+                showNotification(`${username}: ${text.substring(0, 50)}...`);
+            }
+        }
+
+        // Add System Message
+        function addSystemMessage(text) {
+            const messagesArea = document.getElementById('messagesArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            const now = new Date();
+            const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    SYSTEM <span class="timestamp">[${time}]</span>
+                </div>
+                <div class="message-content">${text}</div>
+            `;
+            
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            messageCount++;
+        }
+
+        // Image Upload & Pixelation
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                pixelateImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function pixelateImage(imageData) {
+            const canvas = document.getElementById('pixelCanvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = function() {
+                const maxWidth = 300;
+                const scale = maxWidth / img.width;
+                const width = maxWidth;
+                const height = img.height * scale;
+                
+                // Pixelation effect
+                const pixelSize = pixelationLevel * 2;
+                const smallWidth = Math.ceil(width / pixelSize);
+                const smallHeight = Math.ceil(height / pixelSize);
+                
+                canvas.width = smallWidth;
+                canvas.height = smallHeight;
+                ctx.drawImage(img, 0, 0, smallWidth, smallHeight);
+                
+                const pixelatedData = canvas.toDataURL();
+                
+                const now = new Date();
+                const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                
+                // Send to server
+                socket.emit('image-upload', {
+                    imageData: pixelatedData,
+                    timestamp: time
+                });
+            };
+            
+            img.src = imageData;
+        }
+
+        // Dropdown Menus
+        function toggleDropdown(id) {
+            const dropdown = document.getElementById(id);
+            document.querySelectorAll('.dropdown').forEach(d => {
+                if (d.id !== id) d.classList.remove('show');
+            });
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdowns when clicking elsewhere
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.menu-item')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+            }
+            if (!e.target.closest('.start-menu') && !e.target.closest('.start-button')) {
+                document.getElementById('startMenu').classList.remove('show');
+            }
+        });
+
+        // Windows
+        function showAbout() {
+            document.getElementById('aboutWindow').classList.add('active');
+        }
+
+        function showSettings() {
+            document.getElementById('settingsWindow').classList.add('active');
+            document.getElementById('settingsColor').value = userColor;
+            document.getElementById('settingsUsername').value = currentUser;
+        }
+
+        function closeWindow(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function minimizeWindow(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function focusWindow(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function openChatWindow() {
+            document.getElementById('chatWindow').classList.add('active');
+        }
+
+        function showHelp() {
+            alert('HOW TO USE RETROCHATROOM 95\n\n' +
+                  'Type messages in the input box\n' +
+                  'Click "Image" to upload & auto-pixelate pics\n' +
+                  'Use File > Settings to customize\n' +
+                  'Change your window border color in Settings\n\n' +
+                  'Stay kewl!');
+        }
+
+        // Settings
+        function updateUserColor(color) {
+            userColor = color;
+        }
+
+        function updateBorderColor(color) {
+            document.querySelectorAll('.title-bar').forEach(bar => {
+                bar.style.background = `linear-gradient(to right, ${color}, ${adjustColor(color, 30)})`;
+            });
+        }
+
+        function adjustColor(color, percent) {
+            const num = parseInt(color.replace("#",""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 +
+                (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255))
+                .toString(16).slice(1);
+        }
+
+        function saveSettings() {
+            userColor = document.getElementById('settingsColor').value;
+            const borderColor = document.getElementById('borderColor').value;
+            updateBorderColor(borderColor);
+            const newUsername = document.getElementById('settingsUsername').value.trim();
+            if (newUsername && newUsername !== currentUser) {
+                addSystemMessage(`${currentUser} changed their name to ${newUsername}.`);
+                currentUser = newUsername;
+                users[0] = currentUser;
+                updateUsersList();
+            }
+            pixelationLevel = parseInt(document.getElementById('pixelLevel').value);
+            alert('Settings saved!');
+            closeWindow('settingsWindow');
+        }
+
+        // Users List
+        function updateUsersList() {
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = users.map(user => 
+                `<div class="user-item online">${user}</div>`
+            ).join('');
+            document.getElementById('userCount').textContent = `Users: ${users.length}`;
+        }
+
+        // Notifications
+        function showNotification(text) {
+            const notif = document.getElementById('notification');
+            const notifToggle = document.getElementById('notifToggle')?.value;
+            
+            if (notifToggle === 'off') return;
+            
+            document.getElementById('notificationText').textContent = text;
+            notif.classList.add('show');
+            
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, 3000);
+        }
+
+        // Clear Chat
+        function clearChat() {
+            if (confirm('Are you sure you want to clear this chat?')) {
+                const messagesArea = document.getElementById('messagesArea');
+                messagesArea.innerHTML = '';
+                addSystemMessage('Chat cleared.');
+                messageCount = 1;
+            }
+        }
+
+        // Export Chat
+        function exportChat() {
+            const messagesArea = document.getElementById('messagesArea');
+            const text = messagesArea.innerText;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `chat-${Date.now()}.txt`;
+            a.click();
+            alert('Chat exported!');
+        }
+
+        // Enter to send
+        document.getElementById('messageInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Draggable windows
+        let isDragging = false;
+        let currentWindow = null;
+        let offsetX, offsetY;
+
+        document.querySelectorAll('.title-bar').forEach(titleBar => {
+            titleBar.addEventListener('mousedown', function(e) {
+                if (e.target.tagName === 'BUTTON') return;
+                isDragging = true;
+                currentWindow = this.parentElement;
+                const rect = currentWindow.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+            });
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (isDragging && currentWindow) {
+                currentWindow.style.left = (e.clientX - offsetX) + 'px';
+                currentWindow.style.top = (e.clientY - offsetY) + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', function() {
+            isDragging = false;
+            currentWindow = null;
+        });
+
+        // Initialize
+        updateUsersList();
+
+        // Socket.IO Event Listeners
+        
+        // Receive chat messages
+        socket.on('chat-message', (data) => {
+            addMessage(data.username, data.message, data.color, data.timestamp);
+        });
+
+        // Receive image messages
+        socket.on('image-message', (data) => {
+            const messagesArea = document.getElementById('messagesArea');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <span style="color: ${data.color};">${data.username}</span>
+                    <span class="timestamp">[${data.timestamp}]</span>
+                </div>
+                <div class="message-content">
+                    <img src="${data.imageData}" class="message-image">
+                </div>
+            `;
+            
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+            messageCount++;
+            document.getElementById('messageCount').textContent = `Messages: ${messageCount}`;
+        });
+
+        // User joined
+        socket.on('user-joined', (data) => {
+            addSystemMessage(`${data.username} has entered the chat.`);
+        });
+
+        // User left
+        socket.on('user-left', (data) => {
+            addSystemMessage(`${data.username} has left the chat.`);
+        });
+
+        // Users list update
+        socket.on('users-update', (usersList) => {
+            users = usersList;
+            updateUsersList();
+        });
+
+        // Typing indicator
+        socket.on('user-typing', (data) => {
+            const indicator = document.getElementById('typingIndicator');
+            indicator.textContent = `${data.username} is typing...`;
+        });
+
+        socket.on('user-stop-typing', () => {
+            const indicator = document.getElementById('typingIndicator');
+            indicator.textContent = '';
+        });
+
+        // Connection status
+        socket.on('connect', () => {
+            document.getElementById('statusText').textContent = 'Connected';
+        });
+
+        socket.on('disconnect', () => {
+            document.getElementById('statusText').textContent = 'Disconnected';
+        });
+
+        // Typing detection
+        document.getElementById('messageInput')?.addEventListener('input', function() {
+            socket.emit('typing');
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.emit('stop-typing');
+            }, 1000);
+        });
+
+        // Pixelation slider
+        document.getElementById('pixelLevel')?.addEventListener('input', function(e) {
+            document.getElementById('pixelValue').textContent = e.target.value;
+        });
+
+        // Start Menu
+        function toggleStartMenu() {
+            const menu = document.getElementById('startMenu');
+            menu.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>
