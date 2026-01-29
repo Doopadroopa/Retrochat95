@@ -669,20 +669,26 @@
 
     <canvas id="pixelCanvas" class="pixel-canvas"></canvas>
 
- <script>
-    // GLOBAL VARIABLES (accessible everywhere, including login())
+<script>
+    // GLOBAL VARIABLES
     let currentUser = '';
     let userColor = '#ff00ff';
     let messages = [];
-    let users = []; // Will be populated by backend
+    let users = [];
     let messageCount = 1;
     let pixelationLevel = 5;
     let typingTimeout;
-    let socket; // declare socket globally
 
-    // GLOBAL login function
+    // GLOBAL SOCKET.IO
+    const socket = io("https://retrochat95-production.up.railway.app", {
+        transports: ["websocket"],
+        reconnection: true
+    });
+
+    // LOGIN FUNCTION (global so onclick from HTML works)
     function login() {
-        const username = document.getElementById('usernameInput').value.trim();
+        const usernameInput = document.getElementById('usernameInput');
+        const username = usernameInput.value.trim();
         if (!username) {
             alert('You need a username to enter!');
             return;
@@ -690,7 +696,6 @@
         currentUser = username;
         userColor = document.getElementById('userColor').value;
 
-        // Send login info to server
         socket.emit('user-login', {
             username: currentUser,
             color: userColor
@@ -698,15 +703,12 @@
 
         document.getElementById('loginWindow').classList.remove('active');
         document.getElementById('chatWindow').classList.add('active');
-
         showNotification(`Welcome, ${currentUser}!`);
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-        // Socket.IO Connection
-        socket = io("https://retrochat95-production.up.railway.app");
 
-        // Clock
+        // CLOCK
         function updateClock() {
             const now = new Date();
             const hours = now.getHours() % 12 || 12;
@@ -717,36 +719,35 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Send Message
-        function sendMessage() {
+        // SEND MESSAGE
+        window.sendMessage = function () {
             const input = document.getElementById('messageInput');
             const message = input.value.trim();
-            
             if (!message) return;
-            
+
             const now = new Date();
             const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            
+
             socket.emit('chat-message', {
                 message: message,
                 timestamp: time
             });
-            
+
             input.value = '';
             socket.emit('stop-typing');
-        }
+        };
 
-        // Add Message
+        // ADD MESSAGE FUNCTION
         function addMessage(username, text, color, timestamp) {
             const messagesArea = document.getElementById('messagesArea');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
-            
+
             const time = timestamp || (() => {
                 const now = new Date();
                 return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
             })();
-            
+
             messageDiv.innerHTML = `
                 <div class="message-header">
                     <span style="color: ${color};">${username}</span>
@@ -754,91 +755,209 @@
                 </div>
                 <div class="message-content">${text}</div>
             `;
-            
+
             messagesArea.appendChild(messageDiv);
             messagesArea.scrollTop = messagesArea.scrollHeight;
-            
+
             messageCount++;
             document.getElementById('messageCount').textContent = `Messages: ${messageCount}`;
-            
+
             if (username !== currentUser) {
                 showNotification(`${username}: ${text.substring(0, 50)}...`);
             }
         }
 
-        // Add System Message
+        // ADD SYSTEM MESSAGE
         function addSystemMessage(text) {
             const messagesArea = document.getElementById('messagesArea');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
-            
+
             const now = new Date();
             const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            
+
             messageDiv.innerHTML = `
                 <div class="message-header">
                     SYSTEM <span class="timestamp">[${time}]</span>
                 </div>
                 <div class="message-content">${text}</div>
             `;
-            
+
             messagesArea.appendChild(messageDiv);
             messagesArea.scrollTop = messagesArea.scrollHeight;
             messageCount++;
         }
 
-        // Image Upload & Pixelation
-        function handleImageUpload(event) {
+        // HANDLE IMAGE UPLOAD
+        window.handleImageUpload = function (event) {
             const file = event.target.files[0];
             if (!file) return;
-            
+
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 pixelateImage(e.target.result);
             };
             reader.readAsDataURL(file);
-        }
+        };
 
         function pixelateImage(imageData) {
             const canvas = document.getElementById('pixelCanvas');
             const ctx = canvas.getContext('2d');
             const img = new Image();
-            
-            img.onload = function() {
+
+            img.onload = function () {
                 const maxWidth = 300;
                 const scale = maxWidth / img.width;
                 const width = maxWidth;
                 const height = img.height * scale;
-                
+
                 const pixelSize = pixelationLevel * 2;
                 const smallWidth = Math.ceil(width / pixelSize);
                 const smallHeight = Math.ceil(height / pixelSize);
-                
+
                 canvas.width = smallWidth;
                 canvas.height = smallHeight;
                 ctx.drawImage(img, 0, 0, smallWidth, smallHeight);
-                
+
                 const pixelatedData = canvas.toDataURL();
                 const now = new Date();
                 const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-                
+
                 socket.emit('image-upload', {
                     imageData: pixelatedData,
                     timestamp: time
                 });
             };
-            
+
             img.src = imageData;
         }
 
-        // ... keep all your other functions exactly the same ...
+        // DROPDOWN MENUS
+        window.toggleDropdown = function (id) {
+            const dropdown = document.getElementById(id);
+            document.querySelectorAll('.dropdown').forEach(d => {
+                if (d.id !== id) d.classList.remove('show');
+            });
+            dropdown.classList.toggle('show');
+        };
 
-        // Initialize
+        // CLOSE MENUS
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.menu-item')) {
+                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+            }
+            if (!e.target.closest('.start-menu') && !e.target.closest('.start-button')) {
+                document.getElementById('startMenu').classList.remove('show');
+            }
+        });
+
+        // WINDOW FUNCTIONS
+        window.showAbout = function () { document.getElementById('aboutWindow').classList.add('active'); };
+        window.showSettings = function () {
+            document.getElementById('settingsWindow').classList.add('active');
+            document.getElementById('settingsColor').value = userColor;
+            document.getElementById('settingsUsername').value = currentUser;
+        };
+        window.closeWindow = function (id) { document.getElementById(id).classList.remove('active'); };
+        window.minimizeWindow = function (id) { document.getElementById(id).classList.remove('active'); };
+        window.focusWindow = function (id) { document.getElementById(id).classList.add('active'); };
+        window.openChatWindow = function () { document.getElementById('chatWindow').classList.add('active'); };
+
+        window.showHelp = function () {
+            alert(
+                'HOW TO USE RETROCHATROOM 95\n\n' +
+                'Type messages in the input box\n' +
+                'Click "Image" to upload & auto-pixelate pics\n' +
+                'Use File > Settings to customize\n' +
+                'Change your window border color in Settings'
+            );
+        };
+
+        // SETTINGS
+        window.updateUserColor = function (color) { userColor = color; };
+        window.updateBorderColor = function (color) {
+            document.querySelectorAll('.title-bar').forEach(bar => {
+                bar.style.background = `linear-gradient(to right, ${color}, ${adjustColor(color, 30)})`;
+            });
+        };
+
+        function adjustColor(color, percent) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255))
+                .toString(16).slice(1);
+        }
+
+        window.saveSettings = function () {
+            userColor = document.getElementById('settingsColor').value;
+            const borderColor = document.getElementById('borderColor').value;
+            updateBorderColor(borderColor);
+            const newUsername = document.getElementById('settingsUsername').value.trim();
+            if (newUsername && newUsername !== currentUser) {
+                addSystemMessage(`${currentUser} changed their name to ${newUsername}.`);
+                currentUser = newUsername;
+                updateUsersList();
+            }
+            pixelationLevel = parseInt(document.getElementById('pixelLevel').value);
+            alert('Settings saved!');
+            closeWindow('settingsWindow');
+        };
+
+        function updateUsersList() {
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = users.map(u => `<div class="user-item online">${u}</div>`).join('');
+            document.getElementById('userCount').textContent = `Users: ${users.length}`;
+        }
+
+        function showNotification(text) {
+            const notif = document.getElementById('notification');
+            if (document.getElementById('notifToggle')?.value === 'off') return;
+            document.getElementById('notificationText').textContent = text;
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 3000);
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // DRAGGABLE WINDOWS
+        let isDragging = false;
+        let currentWin = null;
+        let offsetX, offsetY;
+
+        document.querySelectorAll('.title-bar').forEach(titleBar => {
+            titleBar.addEventListener('mousedown', function (e) {
+                if (e.target.tagName === 'BUTTON') return;
+                isDragging = true;
+                currentWin = this.parentElement;
+                const rect = currentWin.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+            });
+        });
+
+        document.addEventListener('mousemove', function (e) {
+            if (isDragging && currentWin) {
+                currentWin.style.left = (e.clientX - offsetX) + 'px';
+                currentWin.style.top = (e.clientY - offsetY) + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', function () {
+            isDragging = false;
+            currentWin = null;
+        });
+
         updateUsersList();
 
-        // Socket.IO Event Listeners
-        socket.on('chat-message', (data) => addMessage(data.username, data.message, data.color, data.timestamp));
-        socket.on('image-message', (data) => {
+        // SOCKET.IO EVENT LISTENERS
+        socket.on('chat-message', data => addMessage(data.username, data.message, data.color, data.timestamp));
+        socket.on('image-message', data => {
             const messagesArea = document.getElementById('messagesArea');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
@@ -857,13 +976,14 @@
             document.getElementById('messageCount').textContent = `Messages: ${messageCount}`;
         });
 
-        socket.on('user-joined', (data) => addSystemMessage(`${data.username} has entered the chat.`));
-        socket.on('user-left', (data) => addSystemMessage(`${data.username} has left the chat.`));
-        socket.on('users-update', (usersList) => { users = usersList; updateUsersList(); });
-        socket.on('user-typing', (data) => document.getElementById('typingIndicator').textContent = `${data.username} is typing...`);
+        socket.on('user-joined', data => addSystemMessage(`${data.username} has entered the chat.`));
+        socket.on('user-left', data => addSystemMessage(`${data.username} has left the chat.`));
+        socket.on('users-update', list => { users = list; updateUsersList(); });
+        socket.on('user-typing', data => document.getElementById('typingIndicator').textContent = `${data.username} is typing...`);
         socket.on('user-stop-typing', () => document.getElementById('typingIndicator').textContent = '');
-        socket.on('connect', () => document.getElementById('statusText').textContent = 'Connected');
+        socket.on('connect', () => document.getElementById('statusText').textContent = 'Connected'); 
         socket.on('disconnect', () => document.getElementById('statusText').textContent = 'Disconnected');
+
     });
 </script>
 </body>
