@@ -670,6 +670,8 @@
     <canvas id="pixelCanvas" class="pixel-canvas"></canvas>
 
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            
         // Socket.IO Connection
         // IMPORTANT: Replace this URL with your host deployment URL after deploying!
         // For local testing, use: const socket = io('http://localhost:3000');
@@ -1101,6 +1103,7 @@
             const menu = document.getElementById('startMenu');
             menu.classList.toggle('show');
         }
+    });
     </script>
 </body>
 </html>
