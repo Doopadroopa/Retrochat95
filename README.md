@@ -4,4 +4,6 @@ Full on retrofied windows 95 GLOBAL chat! its one of my first projects so expect
 Basically! choose a username then get goin! chat with the people and have sum good ol funsies!
 # WARNING
 the servers can go down as they arent locally hosted! (im not that rich) so theyre on my trial railway account, so when it ends ill have to find a solution so i guess enjoy it!
+# MAKING SOMETHING WITH THE CODE
+as you see, the code html whatever is right there! also theres instructions in the code! just go edit and make your own retrochat spinoffs!
 
