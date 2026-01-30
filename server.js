@@ -1,6 +1,5 @@
 // ============================================================================
-// RETROCHAT95 v1.0 - ULTIMATE EDITION
-// Complete Server Rewrite with Bug Fixes and Game Support
+// uh uh retrochat serverjs
 // ============================================================================
 
 const express = require('express');
