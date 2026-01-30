@@ -558,12 +558,12 @@
 
                 <div class="typing-indicator" id="typingIndicator"></div>
                 
-<div class="input-area">
-    <button onclick="document.getElementById('imageInput').click()">Image</button>
-    <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)" style="display:none;">
-    <input type="text" id="messageInput" placeholder="Type your message here..." maxlength="500">
-    <button onclick="sendMessage()">SEND</button>
-</div>
+                <div class="input-area">
+                    <button onclick="triggerImageUpload()">Image</button>
+                    <input type="file" id="imageInput" accept="image/*" style="display:none;">
+                    <input type="text" id="messageInput" placeholder="Type your message here..." maxlength="500">
+                    <button onclick="sendMessage()">SEND</button>
+                </div>
 
                 <div class="status-bar">
                     <span id="statusText">Connected</span>
@@ -631,7 +631,7 @@
                     </div>
                     <div class="setting-item">
                         <label>Pixelation Level:</label>
-                        <input type="range" id="pixelLevel" min="1" max="10" value="5">
+                        <input type="range" id="pixelLevel" min="1" max="10" value="5" oninput="document.getElementById('pixelValue').textContent = this.value">
                         <span id="pixelValue">5</span>
                     </div>
                     <div class="setting-item">
@@ -683,7 +683,9 @@
         reconnection: true
     });
 
-    // LOGIN FUNCTION (global so onclick from HTML works)
+    // ===== GLOBAL FUNCTIONS (must be defined before use) =====
+    
+    // LOGIN FUNCTION
     function login() {
         const usernameInput = document.getElementById('usernameInput');
         const username = usernameInput.value.trim();
@@ -704,6 +706,146 @@
         showNotification(`Welcome, ${currentUser}!`);
     }
 
+    // IMAGE UPLOAD TRIGGER
+    function triggerImageUpload() {
+        document.getElementById('imageInput').click();
+    }
+
+    // SEND MESSAGE
+    function sendMessage() {
+        const input = document.getElementById('messageInput');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const now = new Date();
+        const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        socket.emit('chat-message', {
+            message: message,
+            timestamp: time
+        });
+
+        input.value = '';
+        socket.emit('stop-typing');
+    }
+
+    // WINDOW FUNCTIONS
+    function showAbout() { 
+        document.getElementById('aboutWindow').classList.add('active'); 
+    }
+    
+    function showSettings() {
+        document.getElementById('settingsWindow').classList.add('active');
+        document.getElementById('settingsColor').value = userColor;
+        document.getElementById('settingsUsername').value = currentUser;
+    }
+    
+    function closeWindow(id) { 
+        document.getElementById(id).classList.remove('active'); 
+    }
+    
+    function minimizeWindow(id) { 
+        document.getElementById(id).classList.remove('active'); 
+    }
+    
+    function focusWindow(id) { 
+        document.getElementById(id).classList.add('active'); 
+    }
+    
+    function openChatWindow() { 
+        document.getElementById('chatWindow').classList.add('active'); 
+    }
+
+    // TOGGLE START MENU
+    function toggleStartMenu() {
+        const menu = document.getElementById('startMenu');
+        menu.classList.toggle('show');
+    }
+
+    // TOGGLE DROPDOWN
+    function toggleDropdown(id) {
+        const dropdown = document.getElementById(id);
+        document.querySelectorAll('.dropdown').forEach(d => {
+            if (d.id !== id) d.classList.remove('show');
+        });
+        dropdown.classList.toggle('show');
+    }
+
+    // SHOW HELP
+    function showHelp() {
+        alert(
+            'HOW TO USE RETROCHATROOM 95\n\n' +
+            'Type messages in the input box\n' +
+            'Click "Image" to upload & auto-pixelate pics\n' +
+            'Use File > Settings to customize\n' +
+            'Change your window border color in Settings\n\n' +
+            'Stay kewl!'
+        );
+    }
+
+    // UPDATE USER COLOR
+    function updateUserColor(color) { 
+        userColor = color; 
+    }
+
+    // UPDATE BORDER COLOR
+    function updateBorderColor(color) {
+        document.querySelectorAll('.title-bar').forEach(bar => {
+            bar.style.background = `linear-gradient(to right, ${color}, ${adjustColor(color, 30)})`;
+        });
+    }
+
+    // ADJUST COLOR HELPER
+    function adjustColor(color, percent) {
+        const num = parseInt(color.replace("#", ""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) + amt;
+        const G = (num >> 8 & 0x00FF) + amt;
+        const B = (num & 0x0000FF) + amt;
+        return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255))
+            .toString(16).slice(1);
+    }
+
+    // SAVE SETTINGS
+    function saveSettings() {
+        userColor = document.getElementById('settingsColor').value;
+        const borderColor = document.getElementById('borderColor').value;
+        updateBorderColor(borderColor);
+        const newUsername = document.getElementById('settingsUsername').value.trim();
+        if (newUsername && newUsername !== currentUser) {
+            addSystemMessage(`${currentUser} changed their name to ${newUsername}.`);
+            currentUser = newUsername;
+            updateUsersList();
+        }
+        pixelationLevel = parseInt(document.getElementById('pixelLevel').value);
+        alert('Settings saved!');
+        closeWindow('settingsWindow');
+    }
+
+    // CLEAR CHAT
+    function clearChat() {
+        if (confirm('Are you sure you want to clear this chat?')) {
+            const messagesArea = document.getElementById('messagesArea');
+            messagesArea.innerHTML = '';
+            addSystemMessage('Chat cleared.');
+            messageCount = 1;
+        }
+    }
+
+    // EXPORT CHAT
+    function exportChat() {
+        const messagesArea = document.getElementById('messagesArea');
+        const text = messagesArea.innerText;
+        const blob = new Blob([text], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `chat-${Date.now()}.txt`;
+        a.click();
+        alert('Chat exported!');
+    }
+
+    // ===== DOM READY =====
     document.addEventListener("DOMContentLoaded", () => {
 
         // CLOCK
@@ -716,24 +858,6 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
-
-        // SEND MESSAGE
-        window.sendMessage = function () {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            if (!message) return;
-
-            const now = new Date();
-            const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-            socket.emit('chat-message', {
-                message: message,
-                timestamp: time
-            });
-
-            input.value = '';
-            socket.emit('stop-typing');
-        };
 
         // ADD MESSAGE FUNCTION
         function addMessage(username, text, color, timestamp) {
@@ -766,7 +890,7 @@
         }
 
         // ADD SYSTEM MESSAGE
-        function addSystemMessage(text) {
+        window.addSystemMessage = function(text) {
             const messagesArea = document.getElementById('messagesArea');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
@@ -784,10 +908,10 @@
             messagesArea.appendChild(messageDiv);
             messagesArea.scrollTop = messagesArea.scrollHeight;
             messageCount++;
-        }
+        };
 
         // HANDLE IMAGE UPLOAD
-        window.handleImageUpload = function (event) {
+        document.getElementById('imageInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -796,7 +920,7 @@
                 pixelateImage(e.target.result);
             };
             reader.readAsDataURL(file);
-        };
+        });
 
         function pixelateImage(imageData) {
             const canvas = document.getElementById('pixelCanvas');
@@ -830,15 +954,6 @@
             img.src = imageData;
         }
 
-        // DROPDOWN MENUS
-        window.toggleDropdown = function (id) {
-            const dropdown = document.getElementById(id);
-            document.querySelectorAll('.dropdown').forEach(d => {
-                if (d.id !== id) d.classList.remove('show');
-            });
-            dropdown.classList.toggle('show');
-        };
-
         // CLOSE MENUS
         document.addEventListener('click', function (e) {
             if (!e.target.closest('.menu-item')) {
@@ -849,67 +964,12 @@
             }
         });
 
-        // WINDOW FUNCTIONS
-        window.showAbout = function () { document.getElementById('aboutWindow').classList.add('active'); };
-        window.showSettings = function () {
-            document.getElementById('settingsWindow').classList.add('active');
-            document.getElementById('settingsColor').value = userColor;
-            document.getElementById('settingsUsername').value = currentUser;
-        };
-        window.closeWindow = function (id) { document.getElementById(id).classList.remove('active'); };
-        window.minimizeWindow = function (id) { document.getElementById(id).classList.remove('active'); };
-        window.focusWindow = function (id) { document.getElementById(id).classList.add('active'); };
-        window.openChatWindow = function () { document.getElementById('chatWindow').classList.add('active'); };
-
-        window.showHelp = function () {
-            alert(
-                'HOW TO USE RETROCHATROOM 95\n\n' +
-                'Type messages in the input box\n' +
-                'Click "Image" to upload & auto-pixelate pics\n' +
-                'Use File > Settings to customize\n' +
-                'Change your window border color in Settings'
-            );
-        };
-
-        // SETTINGS
-        window.updateUserColor = function (color) { userColor = color; };
-        window.updateBorderColor = function (color) {
-            document.querySelectorAll('.title-bar').forEach(bar => {
-                bar.style.background = `linear-gradient(to right, ${color}, ${adjustColor(color, 30)})`;
-            });
-        };
-
-        function adjustColor(color, percent) {
-            const num = parseInt(color.replace("#", ""), 16);
-            const amt = Math.round(2.55 * percent);
-            const R = (num >> 16) + amt;
-            const G = (num >> 8 & 0x00FF) + amt;
-            const B = (num & 0x0000FF) + amt;
-            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255))
-                .toString(16).slice(1);
-        }
-
-        window.saveSettings = function () {
-            userColor = document.getElementById('settingsColor').value;
-            const borderColor = document.getElementById('borderColor').value;
-            updateBorderColor(borderColor);
-            const newUsername = document.getElementById('settingsUsername').value.trim();
-            if (newUsername && newUsername !== currentUser) {
-                addSystemMessage(`${currentUser} changed their name to ${newUsername}.`);
-                currentUser = newUsername;
-                updateUsersList();
-            }
-            pixelationLevel = parseInt(document.getElementById('pixelLevel').value);
-            alert('Settings saved!');
-            closeWindow('settingsWindow');
-        };
-
         function updateUsersList() {
             const usersList = document.getElementById('usersList');
             usersList.innerHTML = users.map(u => `<div class="user-item online">${u}</div>`).join('');
             document.getElementById('userCount').textContent = `Users: ${users.length}`;
         }
+        window.updateUsersList = updateUsersList;
 
         function showNotification(text) {
             const notif = document.getElementById('notification');
@@ -918,9 +978,20 @@
             notif.classList.add('show');
             setTimeout(() => notif.classList.remove('show'), 3000);
         }
+        window.showNotification = showNotification;
 
+        // ENTER TO SEND
         document.getElementById('messageInput').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') sendMessage();
+        });
+
+        // TYPING INDICATOR
+        document.getElementById('messageInput').addEventListener('input', function() {
+            socket.emit('typing');
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.emit('stop-typing');
+            }, 1000);
         });
 
         // DRAGGABLE WINDOWS
@@ -955,6 +1026,7 @@
 
         // SOCKET.IO EVENT LISTENERS
         socket.on('chat-message', data => addMessage(data.username, data.message, data.color, data.timestamp));
+        
         socket.on('image-message', data => {
             const messagesArea = document.getElementById('messagesArea');
             const messageDiv = document.createElement('div');
