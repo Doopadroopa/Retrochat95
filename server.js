@@ -29,7 +29,7 @@ let rooms = {
     'random': { users: [], messages: [] },
     'images': { users: [], messages: [] },
     'windows': { users: [], messages: [] }
-};
+});
 
 // EMOTE IMAGES (base64 or URLs)
 const emotes = {
@@ -40,7 +40,7 @@ const emotes = {
     'error': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/error.png',
     'cool': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/Derp-face.png',
     'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/pixel-art-fire-icon-png.png'
-};
+});
 
 // FAKE WIN95 ERRORS
 const win95Errors = [
@@ -50,7 +50,7 @@ const win95Errors = [
     "The system is dangerously low on resources!",
     "Cannot find KERNEL32.DLL",
     "GPF in module MSVCRT.DLL at 0137:BFF9B3BC"
-];
+]);
 
 io.on('connection', (socket) => {
     console.log('Connection:', socket.id);
