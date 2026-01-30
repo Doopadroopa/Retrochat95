@@ -64,7 +64,7 @@ io.on('connection', (socket) => {
         achievements: [],
         messageCount: 0,
         joinTime: Date.now()
-    };
+    });
 
     // USER LOGIN / REGISTER
     socket.on('user-login', (data) => {
