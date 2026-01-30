@@ -3,26 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetroChat95 v1.0 - Official Release</title>
-    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js" crossorigin="anonymous"></script>
+    <title>RetroChat95 v1.0 - ULTIMATE EDITION</title>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
     <style>
-        /* ====== RESET ====== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* ====== BODY & DESKTOP ====== */
         body {
             font-family: 'Comic Sans MS', 'Comic Sans', cursive;
             background: #008080;
             overflow: hidden;
             height: 100vh;
-            position: relative;
         }
 
-        /* CRT MODE EFFECT */
         body.crt-mode::before {
             content: " ";
             display: block;
@@ -30,16 +26,15 @@
             top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
                         linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 9999;
+            z-index: 99999;
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
             animation: flicker 0.15s infinite;
         }
 
         @keyframes flicker {
-            0% { opacity: 0.97; }
+            0%, 100% { opacity: 0.97; }
             50% { opacity: 1; }
-            100% { opacity: 0.97; }
         }
 
         body.crt-mode {
@@ -52,14 +47,11 @@
             padding: 10px;
         }
 
-        /* ====== DESKTOP ICON ====== */
         .desktop-icon {
             width: 80px;
             text-align: center;
             cursor: pointer;
             position: absolute;
-            top: 20px;
-            left: 20px;
             user-select: none;
         }
 
@@ -87,7 +79,6 @@
             border-color: #000000 #ffffff #ffffff #000000;
         }
 
-        /* ====== WINDOWS ====== */
         .window {
             position: absolute;
             background: #c0c0c0;
@@ -114,32 +105,18 @@
             user-select: none;
         }
 
-        .title-bar-text {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .title-bar-controls {
-            display: flex;
-            gap: 2px;
-        }
-
         .title-bar-controls button {
             width: 18px;
             height: 18px;
             font-size: 10px;
             padding: 0;
-            font-weight: bold;
             cursor: pointer;
         }
 
         .window-body {
             padding: 10px;
-            background: #c0c0c0;
         }
 
-        /* ====== BUTTONS ====== */
         button {
             background: #c0c0c0;
             border: 2px solid;
@@ -154,13 +131,7 @@
             border-color: #000000 #ffffff #ffffff #000000;
         }
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* ====== INPUTS ====== */
-        input[type="text"], input[type="password"] {
+        input[type="text"], input[type="password"], textarea {
             padding: 5px;
             border: 2px inset #808080;
             font-family: 'Comic Sans MS', cursive;
@@ -174,22 +145,6 @@
             cursor: pointer;
         }
 
-        input[type="range"] {
-            width: 100%;
-        }
-
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-        }
-
-        select {
-            padding: 5px;
-            border: 2px inset #808080;
-            font-family: 'Comic Sans MS', cursive;
-        }
-
-        /* ====== CHAT WINDOW ====== */
         .chat-window {
             width: 780px;
             height: 600px;
@@ -209,7 +164,6 @@
             padding: 4px 10px;
             cursor: pointer;
             position: relative;
-            user-select: none;
         }
 
         .menu-item:hover {
@@ -243,7 +197,6 @@
             color: white;
         }
 
-        /* ====== ROOMS ====== */
         .rooms-selector {
             display: flex;
             gap: 5px;
@@ -259,7 +212,6 @@
             border-color: #000000 #ffffff #ffffff #000000;
             cursor: pointer;
             font-size: 12px;
-            user-select: none;
         }
 
         .room-tab.active {
@@ -267,11 +219,6 @@
             border-color: #ffffff #000000 #000000 #ffffff;
         }
 
-        .room-tab:hover:not(.active) {
-            background: #909090;
-        }
-
-        /* ====== CHAT CONTAINER ====== */
         .chat-container {
             display: flex;
             height: 440px;
@@ -292,20 +239,7 @@
             background: #c0c0c0;
             border: 1px solid #808080;
             font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
-
-        .user-status {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .user-status.online { background: #00ff00; }
-        .user-status.away { background: #ffff00; }
-        .user-status.busy { background: #ff0000; }
 
         .messages-area {
             flex: 1;
@@ -325,20 +259,12 @@
             font-weight: bold;
             color: #000080;
             margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
         }
 
         .message-system {
             font-style: italic;
             color: #808080;
             font-size: 12px;
-        }
-
-        .message-action {
-            font-style: italic;
-            color: #006400;
         }
 
         .message-error {
@@ -352,14 +278,12 @@
         }
 
         .message-content {
-            color: #000000;
             margin-left: 10px;
         }
 
         .message-highlight {
             background: #ffff00;
             padding: 2px;
-            font-weight: bold;
         }
 
         .message-image {
@@ -368,15 +292,6 @@
             margin: 5px 0;
             border: 2px solid #808080;
             image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-            cursor: pointer;
-        }
-
-        .reaction-button {
-            font-size: 11px;
-            padding: 2px 6px;
-            margin-left: 5px;
             cursor: pointer;
         }
 
@@ -384,7 +299,6 @@
             font-style: italic;
             color: #808080;
             font-size: 12px;
-            margin: 5px 0;
             min-height: 18px;
         }
 
@@ -392,7 +306,6 @@
             margin-top: 10px;
             display: flex;
             gap: 5px;
-            align-items: center;
         }
 
         .status-bar {
@@ -404,7 +317,6 @@
             gap: 20px;
         }
 
-        /* ====== LOGIN WINDOW ====== */
         .login-window {
             width: 480px;
             height: 420px;
@@ -430,159 +342,139 @@
             font-weight: bold;
         }
 
-        .form-group input {
-            padding: 8px;
-            border: 2px inset #808080;
-            font-family: 'Comic Sans MS', cursive;
-        }
-
-        /* ====== OTHER WINDOWS ====== */
-        .about-window {
-            width: 520px;
-            height: 450px;
-            top: 100px;
-            left: 150px;
-        }
-
-        .about-content {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .about-content h1 {
-            color: #000080;
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-
-        .about-content p {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .settings-window {
-            width: 540px;
-            height: 520px;
-            top: 120px;
+        .game-window {
+            width: 500px;
+            height: 580px;
+            top: 80px;
             left: 200px;
         }
 
-        .settings-content {
-            padding: 15px;
-            max-height: 420px;
-            overflow-y: auto;
+        .game-board {
+            display: grid;
+            gap: 2px;
+            margin: 20px auto;
+            background: #808080;
+            padding: 5px;
+            border: 2px inset #808080;
         }
 
-        .setting-item {
-            margin: 15px 0;
+        .game-cell {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #000000 #000000 #ffffff;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
         }
 
-        .setting-item label {
-            flex: 1;
+        .game-cell:active {
+            border-color: #000000 #ffffff #ffffff #000000;
         }
 
-        .achievements-window {
-            width: 540px;
-            height: 460px;
-            top: 100px;
-            left: 250px;
-        }
-
-        .achievements-list {
-            padding: 15px;
-            max-height: 380px;
-            overflow-y: auto;
-        }
-
-        .achievement-item {
-            padding: 12px;
-            margin: 10px 0;
-            background: white;
-            border: 2px solid #808080;
-        }
-
-        .achievement-item.locked {
-            opacity: 0.5;
-        }
-
-        .achievement-item-title {
+        .game-info {
+            text-align: center;
+            margin: 10px;
+            font-size: 16px;
             font-weight: bold;
-            color: #000080;
         }
 
-        .achievement-item-desc {
-            font-size: 12px;
-            color: #606060;
-            margin-top: 5px;
-        }
-
-        .help-window {
-            width: 580px;
-            height: 540px;
-            top: 80px;
+        .notepad-window {
+            width: 600px;
+            height: 500px;
+            top: 100px;
             left: 180px;
         }
 
-        .help-content {
-            padding: 15px;
-            max-height: 460px;
-            overflow-y: auto;
+        .notepad-textarea {
+            width: 100%;
+            height: 380px;
+            border: 2px inset #808080;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            resize: none;
         }
 
-        .help-section {
-            margin: 15px 0;
+        .paint-window {
+            width: 700px;
+            height: 600px;
+            top: 60px;
+            left: 120px;
         }
 
-        .help-section h3 {
-            color: #000080;
+        .paint-canvas {
+            border: 2px inset #808080;
+            background: white;
+            cursor: crosshair;
+        }
+
+        .paint-tools {
+            display: flex;
+            gap: 5px;
             margin-bottom: 10px;
         }
 
-        .help-section ul {
-            list-style-position: inside;
-            margin-left: 10px;
-        }
-
-        .help-section li {
-            margin: 5px 0;
-        }
-
-        .pm-window {
-            width: 440px;
-            height: 340px;
+        .calculator-window {
+            width: 320px;
+            height: 480px;
             top: 150px;
-            left: 300px;
+            left: 250px;
         }
 
-        .pm-messages {
-            height: 240px;
+        .calc-display {
+            width: 100%;
+            height: 60px;
             border: 2px inset #808080;
-            background: white;
             padding: 10px;
-            overflow-y: auto;
-            font-size: 12px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 10px;
         }
 
-        .pm-input-area {
-            margin-top: 10px;
-            display: flex;
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
             gap: 5px;
         }
 
-        /* ====== POPUPS ====== */
+        .calc-button {
+            height: 50px;
+            font-size: 18px;
+        }
+
+        .screensaver {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: none;
+            z-index: 100000;
+        }
+
+        .screensaver.active {
+            display: block;
+        }
+
+        .screensaver-text {
+            position: absolute;
+            color: #00ff00;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
         .notification {
             position: fixed;
             top: 50px;
             right: 50px;
             background: #ffffcc;
-            border: 2px solid #000000;
+            border: 2px solid #000;
             padding: 15px;
             max-width: 300px;
             display: none;
-            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
             z-index: 10000;
         }
 
@@ -602,32 +494,16 @@
             right: 50px;
             background: #000080;
             color: white;
-            border: 2px solid #ffffff;
+            border: 2px solid #fff;
             padding: 15px;
             width: 320px;
             display: none;
-            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
             z-index: 10001;
-            animation: achievementSlide 0.5s;
-        }
-
-        @keyframes achievementSlide {
-            from { transform: translateX(400px); }
-            to { transform: translateX(0); }
         }
 
         .achievement-popup.show {
             display: block;
-        }
-
-        .achievement-title {
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .achievement-desc {
-            font-size: 13px;
+            animation: slideIn 0.5s;
         }
 
         .win95-error {
@@ -647,30 +523,14 @@
             display: block;
         }
 
-        .error-title-bar {
-            background: #000080;
-            color: white;
-            padding: 3px 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-        }
-
         .error-body {
             padding: 20px;
             display: flex;
             gap: 15px;
-            align-items: flex-start;
         }
 
         .error-icon {
             font-size: 32px;
-        }
-
-        .error-message {
-            flex: 1;
-            font-size: 14px;
         }
 
         .error-buttons {
@@ -678,7 +538,6 @@
             text-align: center;
         }
 
-        /* ====== TASKBAR ====== */
         .taskbar {
             position: fixed;
             bottom: 0;
@@ -720,27 +579,11 @@
         .start-menu-item {
             padding: 8px 20px;
             cursor: pointer;
-            border-bottom: 1px solid #808080;
         }
 
         .start-menu-item:hover {
             background: #000080;
             color: white;
-        }
-
-        .start-menu-separator {
-            height: 2px;
-            background: #808080;
-            margin: 2px 0;
-        }
-
-        .window-button {
-            height: 32px;
-            padding: 0 15px;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         .clock {
@@ -760,51 +603,79 @@
 </head>
 <body>
     <div class="desktop">
-        <!-- Desktop Icon -->
-        <div class="desktop-icon" ondblclick="openChatWindow()">
+        <!-- Desktop Icons -->
+        <div class="desktop-icon" ondblclick="openWindow('chatWindow')" style="top:20px;left:20px;">
             <div class="desktop-icon-image">&#128172;</div>
-            <div class="desktop-icon-label">RetroChat95<br>v1.0</div>
+            <div class="desktop-icon-label">RetroChat95</div>
+        </div>
+
+        <div class="desktop-icon" ondblclick="openGame('tictactoe')" style="top:120px;left:20px;">
+            <div class="desktop-icon-image">X</div>
+            <div class="desktop-icon-label">Tic-Tac-Toe</div>
+        </div>
+
+        <div class="desktop-icon" ondblclick="openGame('minesweeper')" style="top:220px;left:20px;">
+            <div class="desktop-icon-image">*</div>
+            <div class="desktop-icon-label">Minesweeper</div>
+        </div>
+
+        <div class="desktop-icon" ondblclick="openGame('snake')" style="top:320px;left:20px;">
+            <div class="desktop-icon-image">~</div>
+            <div class="desktop-icon-label">Snake</div>
+        </div>
+
+        <div class="desktop-icon" ondblclick="openWindow('notepadWindow')" style="top:20px;right:20px;">
+            <div class="desktop-icon-image">&#128221;</div>
+            <div class="desktop-icon-label">Notepad</div>
+        </div>
+
+        <div class="desktop-icon" ondblclick="openWindow('paintWindow')" style="top:120px;right:20px;">
+            <div class="desktop-icon-image">&#127912;</div>
+            <div class="desktop-icon-label">Paint</div>
+        </div>
+
+        <div class="desktop-icon" ondblclick="openWindow('calculatorWindow')" style="top:220px;right:20px;">
+            <div class="desktop-icon-image">+</div>
+            <div class="desktop-icon-label">Calculator</div>
+        </div>
+
+        <div class="desktop-icon" ondblclick="startScreenSaver()" style="top:320px;right:20px;">
+            <div class="desktop-icon-image">&#127763;</div>
+            <div class="desktop-icon-label">Screensaver</div>
         </div>
 
         <!-- Login Window -->
         <div class="window login-window active" id="loginWindow">
             <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">RetroChat95 v1.0 - Login</div>
+                <span>RetroChat95 v1.0 - Login</span>
             </div>
             <div class="window-body">
                 <div class="login-form">
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <h2 style="color: #000080;">Welcome to RetroChat95!</h2>
-                        <p style="font-size: 12px; color: #606060; margin-top: 5px;">The kewlest chat on the internet</p>
-                    </div>
+                    <h2 style="text-align:center;color:#000080;">Welcome!</h2>
                     <div class="form-group">
                         <label>Username:</label>
-                        <input type="text" id="usernameInput" placeholder="Enter your username" maxlength="20">
+                        <input type="text" id="usernameInput" maxlength="20">
                     </div>
                     <div class="form-group">
-                        <label>Password (optional - for saving your account):</label>
-                        <input type="password" id="passwordInput" placeholder="Leave blank for guest mode">
+                        <label>Password (optional):</label>
+                        <input type="password" id="passwordInput">
                     </div>
                     <div class="form-group">
-                        <label>Choose Your Color:</label>
+                        <label>Color:</label>
                         <input type="color" id="userColor" value="#ff00ff">
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="login(false)" style="flex: 1; padding: 10px;">Login / Register</button>
-                        <button onclick="login(true)" style="flex: 1; padding: 10px;">Guest Mode</button>
+                    <div style="display:flex;gap:10px;">
+                        <button onclick="login(false)" style="flex:1;">Login</button>
+                        <button onclick="login(true)" style="flex:1;">Guest</button>
                     </div>
-                    <p style="text-align: center; margin-top: 15px; font-size: 11px; color: #808080; line-height: 1.4;">
-                        <strong>Registered accounts:</strong> Save achievements & settings<br>
-                        <strong>Guest mode:</strong> Chat without saving progress
-                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- Main Chat Window -->
+        <!-- Chat Window -->
         <div class="window chat-window" id="chatWindow">
             <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">RetroChat95 v1.0 - #<span id="currentRoom">general</span></div>
+                <span>RetroChat95 v1.0 - #<span id="currentRoom">general</span></span>
                 <div class="title-bar-controls">
                     <button onclick="minimizeWindow('chatWindow')">_</button>
                     <button onclick="closeWindow('chatWindow')">X</button>
@@ -815,48 +686,33 @@
                     <div class="menu-item" onclick="toggleDropdown('fileMenu')">
                         File
                         <div class="dropdown" id="fileMenu">
-                            <div class="dropdown-item" onclick="showSettings(); closeAllDropdowns();">Settings</div>
-                            <div class="dropdown-item" onclick="downloadChatLog(); closeAllDropdowns();">Download Chat Log</div>
-                            <div class="dropdown-item" onclick="clearChat(); closeAllDropdowns();">Clear Chat</div>
+                            <div class="dropdown-item" onclick="downloadChat();closeAllDropdowns();">Download Log</div>
+                            <div class="dropdown-item" onclick="clearChat();closeAllDropdowns();">Clear Chat</div>
                         </div>
                     </div>
                     <div class="menu-item" onclick="toggleDropdown('viewMenu')">
                         View
                         <div class="dropdown" id="viewMenu">
-                            <div class="dropdown-item" onclick="showAchievements(); closeAllDropdowns();">Achievements</div>
-                            <div class="dropdown-item" onclick="toggleCRTMode(); closeAllDropdowns();">Toggle CRT Mode</div>
-                        </div>
-                    </div>
-                    <div class="menu-item" onclick="toggleDropdown('helpMenu')">
-                        Help
-                        <div class="dropdown" id="helpMenu">
-                            <div class="dropdown-item" onclick="showHelp(); closeAllDropdowns();">Commands</div>
-                            <div class="dropdown-item" onclick="showAbout(); closeAllDropdowns();">About</div>
+                            <div class="dropdown-item" onclick="toggleCRT();closeAllDropdowns();">Toggle CRT</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Room Tabs -->
                 <div class="rooms-selector">
-                    <div class="room-tab active" data-room="general" onclick="switchRoom('general')">#general</div>
-                    <div class="room-tab" data-room="random" onclick="switchRoom('random')">#random</div>
-                    <div class="room-tab" data-room="images" onclick="switchRoom('images')">#images</div>
-                    <div class="room-tab" data-room="windows" onclick="switchRoom('windows')">#windows</div>
+                    <div class="room-tab active" onclick="switchRoom('general')">#general</div>
+                    <div class="room-tab" onclick="switchRoom('random')">#random</div>
+                    <div class="room-tab" onclick="switchRoom('images')">#images</div>
+                    <div class="room-tab" onclick="switchRoom('windows')">#windows</div>
                 </div>
 
                 <div class="chat-container">
                     <div class="users-panel">
-                        <div style="font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #000; padding-bottom: 3px;">
-                            ONLINE USERS
-                        </div>
+                        <strong>ONLINE</strong>
                         <div id="usersList"></div>
                     </div>
-
                     <div class="messages-area" id="messagesArea">
                         <div class="message message-system">
-                            <div class="message-content">
-                                Welcome to RetroChat95 v1.0! Type /help to see all commands.
-                            </div>
+                            Welcome to RetroChat95! Type /help for commands.
                         </div>
                     </div>
                 </div>
@@ -864,246 +720,138 @@
                 <div class="typing-indicator" id="typingIndicator"></div>
                 
                 <div class="input-area">
-                    <button onclick="triggerImageUpload()" title="Upload an image">Image</button>
+                    <button onclick="triggerImageUpload()">IMG</button>
                     <input type="file" id="imageInput" accept="image/*" style="display:none;">
-                    <input type="text" id="messageInput" placeholder="Type message or /help..." maxlength="500" autocomplete="off" style="flex: 1;">
+                    <input type="text" id="messageInput" placeholder="Type message..." maxlength="500" style="flex:1;">
                     <button onclick="sendMessage()">SEND</button>
                 </div>
 
                 <div class="status-bar">
                     <span id="statusText">Connected</span>
-                    <span id="messageCount">Messages: 0</span>
                     <span id="userCount">Users: 0</span>
                     <span id="roomInfo">Room: #general</span>
                 </div>
             </div>
         </div>
 
-        <!-- About Window -->
-        <div class="window about-window" id="aboutWindow">
+        <!-- Game Window -->
+        <div class="window game-window" id="gameWindow">
             <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">About RetroChat95 v1.0</div>
+                <span id="gameTitle">Game</span>
                 <div class="title-bar-controls">
-                    <button onclick="closeWindow('aboutWindow')">X</button>
+                    <button onclick="closeWindow('gameWindow')">X</button>
                 </div>
             </div>
             <div class="window-body">
-                <div class="about-content">
-                    <h1>RetroChat95</h1>
-                    <p><strong>Version:</strong> 1.0 - Official Release</p>
-                    <p><strong>Released:</strong> January 2026</p>
-                    <p style="margin-top: 15px;">The kewlest chat experience on the web!</p>
-                    
-                    <p style="margin-top: 25px; text-align: left; margin-left: 60px; line-height: 2;">
-                        <strong>Features:</strong><br>
-                        [x] Multi-room chat (4 rooms)<br>
-                        [x] Private messaging<br>
-                        [x] Image uploads & keywords<br>
-                        [x] Achievement system<br>
-                        [x] Account persistence<br>
-                        [x] Database storage<br>
-                        [x] Slash commands<br>
-                        [x] Message reactions<br>
-                        [x] CRT mode effect<br>
-                        [x] Draggable windows<br>
-                        [x] Pure 90s nostalgia
-                    </p>
-                    
-                    <button onclick="closeWindow('aboutWindow')" style="margin-top: 25px;">OK</button>
+                <div id="gameContent"></div>
+            </div>
+        </div>
+
+        <!-- Notepad Window -->
+        <div class="window notepad-window" id="notepadWindow">
+            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
+                <span>Notepad</span>
+                <div class="title-bar-controls">
+                    <button onclick="closeWindow('notepadWindow')">X</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <textarea class="notepad-textarea" id="notepadText" placeholder="Type your notes here..."></textarea>
+                <button onclick="downloadNotepad()">Save</button>
+                <button onclick="clearNotepad()">Clear</button>
+            </div>
+        </div>
+
+        <!-- Paint Window -->
+        <div class="window paint-window" id="paintWindow">
+            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
+                <span>Paint</span>
+                <div class="title-bar-controls">
+                    <button onclick="closeWindow('paintWindow')">X</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="paint-tools">
+                    <button onclick="setPaintColor('#000000')">Black</button>
+                    <button onclick="setPaintColor('#ff0000')">Red</button>
+                    <button onclick="setPaintColor('#00ff00')">Green</button>
+                    <button onclick="setPaintColor('#0000ff')">Blue</button>
+                    <button onclick="clearPaint()">Clear</button>
+                </div>
+                <canvas id="paintCanvas" class="paint-canvas" width="660" height="480"></canvas>
+            </div>
+        </div>
+
+        <!-- Calculator Window -->
+        <div class="window calculator-window" id="calculatorWindow">
+            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
+                <span>Calculator</span>
+                <div class="title-bar-controls">
+                    <button onclick="closeWindow('calculatorWindow')">X</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <input type="text" class="calc-display" id="calcDisplay" readonly value="0">
+                <div class="calc-buttons">
+                    <button class="calc-button" onclick="calcInput('7')">7</button>
+                    <button class="calc-button" onclick="calcInput('8')">8</button>
+                    <button class="calc-button" onclick="calcInput('9')">9</button>
+                    <button class="calc-button" onclick="calcInput('/')">/</button>
+                    <button class="calc-button" onclick="calcInput('4')">4</button>
+                    <button class="calc-button" onclick="calcInput('5')">5</button>
+                    <button class="calc-button" onclick="calcInput('6')">6</button>
+                    <button class="calc-button" onclick="calcInput('*')">*</button>
+                    <button class="calc-button" onclick="calcInput('1')">1</button>
+                    <button class="calc-button" onclick="calcInput('2')">2</button>
+                    <button class="calc-button" onclick="calcInput('3')">3</button>
+                    <button class="calc-button" onclick="calcInput('-')">-</button>
+                    <button class="calc-button" onclick="calcInput('0')">0</button>
+                    <button class="calc-button" onclick="calcInput('.')">.</button>
+                    <button class="calc-button" onclick="calcEquals()">=</button>
+                    <button class="calc-button" onclick="calcInput('+')">+</button>
+                    <button class="calc-button" onclick="calcClear()" style="grid-column: span 4;">Clear</button>
                 </div>
             </div>
         </div>
 
-        <!-- Settings Window -->
-        <div class="window settings-window" id="settingsWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">Settings</div>
-                <div class="title-bar-controls">
-                    <button onclick="closeWindow('settingsWindow')">X</button>
-                </div>
-            </div>
-            <div class="window-body">
-                <div class="settings-content">
-                    <div class="setting-item">
-                        <label>Your Username:</label>
-                        <input type="text" id="settingsUsername" readonly style="background: #e0e0e0;">
-                    </div>
-                    <div class="setting-item">
-                        <label>Your Color:</label>
-                        <input type="color" id="settingsColor" value="#ff00ff">
-                    </div>
-                    <div class="setting-item">
-                        <label>Window Border Color:</label>
-                        <input type="color" id="borderColor" value="#000080">
-                    </div>
-                    <div class="setting-item">
-                        <label>Status:</label>
-                        <select id="statusSelect">
-                            <option value="Online">Online</option>
-                            <option value="Away">Away</option>
-                            <option value="Busy">Busy</option>
-                        </select>
-                    </div>
-                    <div class="setting-item">
-                        <label>Show Notifications:</label>
-                        <input type="checkbox" id="notifToggle" checked>
-                    </div>
-                    <div class="setting-item">
-                        <label>CRT Mode (Retro Effect):</label>
-                        <input type="checkbox" id="crtToggle">
-                    </div>
-                    <div class="setting-item">
-                        <label>Message Delay (ms):</label>
-                        <input type="range" id="messageDelay" min="0" max="2000" value="0" step="100" style="width: 150px;">
-                        <span id="delayValue">0</span>
-                    </div>
-                    <div class="setting-item">
-                        <label>Image Pixelation Level:</label>
-                        <input type="range" id="pixelLevel" min="1" max="10" value="3" style="width: 150px;">
-                        <span id="pixelValue">3</span>
-                    </div>
-                    <button onclick="saveSettings()" style="margin-top: 25px; width: 100%; padding: 10px;">SAVE SETTINGS</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Achievements Window -->
-        <div class="window achievements-window" id="achievementsWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">Achievements</div>
-                <div class="title-bar-controls">
-                    <button onclick="closeWindow('achievementsWindow')">X</button>
-                </div>
-            </div>
-            <div class="window-body">
-                <div class="achievements-list" id="achievementsList">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Help Window -->
-        <div class="window help-window" id="helpWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">Help - Commands & Features</div>
-                <div class="title-bar-controls">
-                    <button onclick="closeWindow('helpWindow')">X</button>
-                </div>
-            </div>
-            <div class="window-body">
-                <div class="help-content">
-                    <div class="help-section">
-                        <h3>Slash Commands</h3>
-                        <ul>
-                            <li><strong>/me [action]</strong> - Perform an action (e.g., /me dances)</li>
-                            <li><strong>/nick [name]</strong> - Change username (guests only)</li>
-                            <li><strong>/color #RRGGBB</strong> - Change text color (e.g., /color #FF0000)</li>
-                            <li><strong>/clear</strong> - Clear your chat history</li>
-                            <li><strong>/status [status]</strong> - Set status (Online, Away, or Busy)</li>
-                            <li><strong>/join [room]</strong> - Join a room (general, random, images, windows)</li>
-                            <li><strong>/msg [user] [text]</strong> - Send private message to user</li>
-                            <li><strong>/help</strong> - Show this help window</li>
-                        </ul>
-                    </div>
-                    <div class="help-section">
-                        <h3>Image Keywords</h3>
-                        <p>Type these to instantly send images:</p>
-                        <ul>
-                            <li><strong>!dog</strong> - Cute dog image</li>
-                            <li><strong>!cat</strong> - Cat image</li>
-                            <li><strong>!lol</strong> - Laughing face</li>
-                            <li><strong>!windows</strong> - Windows 95 logo</li>
-                            <li><strong>!error</strong> - Error icon</li>
-                            <li><strong>!cool</strong> - Cool face</li>
-                            <li><strong>!fire</strong> - Fire image</li>
-                        </ul>
-                    </div>
-                    <div class="help-section">
-                        <h3>Features</h3>
-                        <ul>
-                            <li>Multi-room chat (4 different rooms)</li>
-                            <li>Private messaging between users</li>
-                            <li>Message reactions (thumbs up)</li>
-                            <li>Image uploads with auto-pixelation</li>
-                            <li>Achievement system (earn badges!)</li>
-                            <li>Account system (save your progress)</li>
-                            <li>Message history (see past messages)</li>
-                            <li>@mention highlights (tag other users)</li>
-                            <li>CRT mode (authentic retro effect)</li>
-                            <li>Fully draggable windows</li>
-                        </ul>
-                    </div>
-                    <div class="help-section">
-                        <h3>Tips</h3>
-                        <ul>
-                            <li>Press Enter to send messages quickly</li>
-                            <li>Drag windows by their title bar</li>
-                            <li>Click on images to view them full-size</li>
-                            <li>Type @ followed by a username to mention them</li>
-                            <li>Registered accounts save achievements automatically</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PM Window -->
-        <div class="window pm-window" id="pmWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">PM: <span id="pmTarget">User</span></div>
-                <div class="title-bar-controls">
-                    <button onclick="closeWindow('pmWindow')">X</button>
-                </div>
-            </div>
-            <div class="window-body">
-                <div class="pm-messages" id="pmMessages"></div>
-                <div class="pm-input-area">
-                    <input type="text" id="pmInput" placeholder="Type private message..." autocomplete="off" style="flex: 1;">
-                    <button onclick="sendPM()">Send</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notification -->
+        <!-- Notifications -->
         <div class="notification" id="notification">
-            <div style="font-weight: bold; margin-bottom: 5px;">New Message</div>
             <div id="notificationText"></div>
         </div>
 
-        <!-- Achievement Popup -->
         <div class="achievement-popup" id="achievementPopup">
-            <div class="achievement-title">[!] Achievement Unlocked!</div>
-            <div class="achievement-desc" id="achievementDesc"></div>
+            <div style="font-weight:bold;margin-bottom:5px;">[!] Achievement Unlocked!</div>
+            <div id="achievementDesc"></div>
         </div>
 
-        <!-- Win95 Error Popup -->
         <div class="win95-error" id="win95Error">
-            <div class="error-title-bar">
+            <div class="title-bar">
                 <span>Error</span>
-                <button onclick="closeWin95Error()" style="width: 16px; height: 16px; padding: 0;">X</button>
+                <div class="title-bar-controls">
+                    <button onclick="closeWin95Error()">X</button>
+                </div>
             </div>
             <div class="error-body">
                 <div class="error-icon">&#9888;</div>
-                <div class="error-message" id="errorMessage"></div>
+                <div id="errorMessage"></div>
             </div>
             <div class="error-buttons">
                 <button onclick="closeWin95Error()">OK</button>
             </div>
         </div>
 
+        <!-- Screensaver -->
+        <div class="screensaver" id="screensaver" onclick="stopScreenSaver()">
+            <div class="screensaver-text" id="screensaverText">RetroChat95</div>
+        </div>
+
         <!-- Taskbar -->
         <div class="taskbar">
             <button class="start-button" onclick="toggleStartMenu()">Start</button>
             <div class="start-menu" id="startMenu">
-                <div class="start-menu-item" onclick="showSettings(); toggleStartMenu();">Settings</div>
-                <div class="start-menu-item" onclick="showAchievements(); toggleStartMenu();">Achievements</div>
-                <div class="start-menu-item" onclick="showHelp(); toggleStartMenu();">Help</div>
-                <div class="start-menu-item" onclick="showAbout(); toggleStartMenu();">About</div>
-                <div class="start-menu-separator"></div>
-                <div class="start-menu-item" onclick="downloadChatLog(); toggleStartMenu();">Download Log</div>
-                <div class="start-menu-item" onclick="clearChat(); toggleStartMenu();">Clear Chat</div>
+                <div class="start-menu-item" onclick="openWindow('chatWindow');toggleStartMenu();">Chat</div>
+                <div class="start-menu-item" onclick="toggleCRT();toggleStartMenu();">CRT Mode</div>
             </div>
-            <button class="window-button" onclick="focusWindow('chatWindow')">RetroChat95 v1.0</button>
             <div class="clock" id="clock">12:00 PM</div>
         </div>
     </div>
@@ -1111,796 +859,951 @@
     <canvas id="pixelCanvas" class="pixel-canvas"></canvas>
 
 <script>
-    // ==================== RETROCHAT95 v1.0 - CLIENT JAVASCRIPT ====================
-    
-    // GLOBAL VARIABLES
-    let currentUser = '';
-    let userColor = '#ff00ff';
-    let userStatus = 'Online';
-    let currentRoom = 'general';
-    let messages = [];
-    let users = [];
-    let messageCount = 0;
-    let pixelationLevel = 3;
-    let typingTimeout;
-    let achievements = [];
-    let messageDelay = 0;
-    let pmTarget = null;
-    let isGuest = false;
+// ============================================================================
+// RETROCHAT95 v1.0 - ULTIMATE EDITION
+// Complete Client with All Features and Games
+// ============================================================================
 
-    // ALL POSSIBLE ACHIEVEMENTS
-    const allAchievements = [
-        { id: 'first-message', title: 'First Message!', desc: 'Sent your first message' },
-        { id: 'chatty', title: 'Chatty', desc: 'Sent 10 messages' },
-        { id: 'super-chatty', title: 'Super Chatty', desc: 'Sent 50 messages' },
-        { id: 'chatterbox', title: 'Chatterbox', desc: 'Sent 100 messages' },
-        { id: 'veteran', title: 'Veteran User', desc: 'Stayed online for 30 minutes' },
-        { id: 'image-poster', title: 'Picture Perfect', desc: 'Posted your first image' },
-        { id: 'room-hopper', title: 'Room Hopper', desc: 'Visited all chat rooms' },
-        { id: 'socialite', title: 'Socialite', desc: 'Sent a private message' }
+// GLOBAL STATE
+let currentUser = '';
+let userColor = '#ff00ff';
+let currentRoom = 'general';
+let users = [];
+let isGuest = false;
+let pixelationLevel = 3;
+let typingTimeout;
+
+// ROOM MESSAGE STORAGE (FIX FOR BUG #2 and #3)
+let roomMessages = {
+    'general': '',
+    'random': '',
+    'images': '',
+    'windows': ''
+};
+
+// SOCKET CONNECTION
+// UPDATE THIS WITH YOUR RAILWAY URL!
+const socket = io("http://localhost:3000", {
+    transports: ["websocket", "polling"],
+    reconnection: true
+});
+
+// ============================================================================
+// WINDOW DRAGGING
+// ============================================================================
+
+let isDragging = false;
+let currentWindow = null;
+let offsetX = 0;
+let offsetY = 0;
+let highestZIndex = 100;
+
+function startDrag(e, windowElement) {
+    if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+    
+    isDragging = true;
+    currentWindow = windowElement;
+    
+    highestZIndex++;
+    currentWindow.style.zIndex = highestZIndex;
+    
+    const rect = currentWindow.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+    
+    e.preventDefault();
+}
+
+document.addEventListener('mousemove', (e) => {
+    if (isDragging && currentWindow) {
+        let newX = e.clientX - offsetX;
+        let newY = e.clientY - offsetY;
+        
+        const maxX = window.innerWidth - currentWindow.offsetWidth;
+        const maxY = window.innerHeight - currentWindow.offsetHeight - 40;
+        
+        newX = Math.max(0, Math.min(newX, maxX));
+        newY = Math.max(0, Math.min(newY, maxY));
+        
+        currentWindow.style.left = newX + 'px';
+        currentWindow.style.top = newY + 'px';
+    }
+});
+
+document.addEventListener('mouseup', () => {
+    isDragging = false;
+    currentWindow = null;
+});
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+function getCurrentTime() {
+    const now = new Date();
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function openWindow(id) {
+    document.getElementById(id).classList.add('active');
+}
+
+function closeWindow(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+function minimizeWindow(id) {
+    closeWindow(id);
+}
+
+function toggleDropdown(id) {
+    const dropdown = document.getElementById(id);
+    document.querySelectorAll('.dropdown').forEach(d => {
+        if (d.id !== id) d.classList.remove('show');
+    });
+    dropdown.classList.toggle('show');
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
+}
+
+function toggleStartMenu() {
+    document.getElementById('startMenu').classList.toggle('show');
+}
+
+function toggleCRT() {
+    document.body.classList.toggle('crt-mode');
+}
+
+// ============================================================================
+// LOGIN
+// ============================================================================
+
+function login(guestMode) {
+    const username = document.getElementById('usernameInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    const color = document.getElementById('userColor').value;
+
+    if (!guestMode && !username) {
+        alert('Enter a username!');
+        return;
+    }
+
+    isGuest = guestMode;
+    currentUser = username;
+    userColor = color;
+
+    socket.emit('user-login', {
+        username: username,
+        color: color,
+        password: password,
+        isGuest: guestMode
+    });
+
+    closeWindow('loginWindow');
+    openWindow('chatWindow');
+}
+
+// ============================================================================
+// CHAT FUNCTIONS
+// ============================================================================
+
+function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    if (!message) return;
+
+    socket.emit('chat-message', {
+        message: message,
+        timestamp: getCurrentTime()
+    });
+
+    input.value = '';
+    socket.emit('stop-typing');
+}
+
+function switchRoom(room) {
+    if (room === currentRoom) return;
+    
+    // SAVE current room messages BEFORE switching (FIX FOR BUG #2)
+    const messagesArea = document.getElementById('messagesArea');
+    roomMessages[currentRoom] = messagesArea.innerHTML;
+    
+    socket.emit('chat-message', {
+        message: `/join ${room}`,
+        timestamp: getCurrentTime()
+    });
+    
+    document.querySelectorAll('.room-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.textContent === '#' + room) tab.classList.add('active');
+    });
+    
+    currentRoom = room;
+    document.getElementById('currentRoom').textContent = room;
+    document.getElementById('roomInfo').textContent = `Room: #${room}`;
+}
+
+// ADD MESSAGE (WITH isHistory parameter to FIX BUG #1)
+function addMessage(username, text, color, timestamp, isHistory = false) {
+    const messagesArea = document.getElementById('messagesArea');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message';
+
+    let messageText = escapeHtml(text);
+    if (messageText.includes('@' + currentUser)) {
+        messageText = messageText.replace(
+            new RegExp('@' + escapeHtml(currentUser), 'g'), 
+            `<span class="message-highlight">@${escapeHtml(currentUser)}</span>`
+        );
+    }
+
+    messageDiv.innerHTML = `
+        <div class="message-header">
+            <span style="color: ${color};">${escapeHtml(username)}</span>
+            <span class="timestamp">[${timestamp}]</span>
+        </div>
+        <div class="message-content">${messageText}</div>
+    `;
+
+    messagesArea.appendChild(messageDiv);
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+
+    // FIX FOR BUG #1: Only notify if NOT history
+    if (!isHistory && username !== currentUser) {
+        showNotification(`${username}: ${text.substring(0, 40)}...`);
+    }
+}
+
+function addSystemMessage(text) {
+    const messagesArea = document.getElementById('messagesArea');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message message-system';
+    messageDiv.textContent = text;
+    messagesArea.appendChild(messageDiv);
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+}
+
+function addErrorMessage(text) {
+    const messagesArea = document.getElementById('messagesArea');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message message-error';
+    messageDiv.textContent = '[ERROR] ' + text;
+    messagesArea.appendChild(messageDiv);
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+}
+
+function addImageMessage(username, imageData, color, timestamp) {
+    const messagesArea = document.getElementById('messagesArea');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message';
+    messageDiv.innerHTML = `
+        <div class="message-header">
+            <span style="color: ${color};">${escapeHtml(username)}</span>
+            <span class="timestamp">[${timestamp}]</span>
+        </div>
+        <div class="message-content">
+            <img src="${imageData}" class="message-image" onclick="window.open(this.src)">
+        </div>
+    `;
+    messagesArea.appendChild(messageDiv);
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+}
+
+function updateUsersList() {
+    const usersList = document.getElementById('usersList');
+    usersList.innerHTML = users.map(u => `
+        <div class="user-item">${escapeHtml(u)}</div>
+    `).join('');
+    document.getElementById('userCount').textContent = `Users: ${users.length}`;
+}
+
+function showNotification(text) {
+    const notif = document.getElementById('notification');
+    document.getElementById('notificationText').textContent = text;
+    notif.classList.add('show');
+    setTimeout(() => notif.classList.remove('show'), 3000);
+}
+
+function showAchievement(title, desc) {
+    const popup = document.getElementById('achievementPopup');
+    document.getElementById('achievementDesc').textContent = `${title} - ${desc}`;
+    popup.classList.add('show');
+    setTimeout(() => popup.classList.remove('show'), 5000);
+}
+
+function closeWin95Error() {
+    document.getElementById('win95Error').classList.remove('show');
+}
+
+function clearChat() {
+    if (confirm('Clear your chat?')) {
+        socket.emit('chat-message', {
+            message: '/clear',
+            timestamp: getCurrentTime()
+        });
+    }
+}
+
+function downloadChat() {
+    const text = document.getElementById('messagesArea').innerText;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `retrochat95-log-${Date.now()}.txt`;
+    a.click();
+}
+
+function triggerImageUpload() {
+    document.getElementById('imageInput').click();
+}
+
+// ============================================================================
+// IMAGE HANDLING
+// ============================================================================
+
+document.getElementById('imageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Image too large! Max 5MB');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        pixelateImage(event.target.result);
+    };
+    reader.readAsDataURL(file);
+});
+
+function pixelateImage(imageData) {
+    const canvas = document.getElementById('pixelCanvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+
+    img.onload = function() {
+        const maxWidth = 500;
+        const maxHeight = 500;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth) {
+            height = (maxWidth / width) * height;
+            width = maxWidth;
+        }
+        if (height > maxHeight) {
+            width = (maxHeight / height) * width;
+            height = maxHeight;
+        }
+
+        const pixelSize = pixelationLevel * 2;
+        const smallWidth = Math.ceil(width / pixelSize);
+        const smallHeight = Math.ceil(height / pixelSize);
+
+        canvas.width = smallWidth;
+        canvas.height = smallHeight;
+        ctx.drawImage(img, 0, 0, smallWidth, smallHeight);
+
+        const pixelatedData = canvas.toDataURL('image/png');
+
+        socket.emit('image-upload', {
+            imageData: pixelatedData,
+            timestamp: getCurrentTime()
+        });
+    };
+
+    img.src = imageData;
+}
+
+// ============================================================================
+// GAMES
+// ============================================================================
+
+function openGame(game) {
+    openWindow('gameWindow');
+    const gameContent = document.getElementById('gameContent');
+    
+    switch(game) {
+        case 'tictactoe':
+            document.getElementById('gameTitle').textContent = 'Tic-Tac-Toe';
+            gameContent.innerHTML = `
+                <div class="game-info" id="tttInfo">Your turn (X)</div>
+                <div class="game-board" id="tttBoard" style="grid-template-columns: repeat(3, 80px); width: 250px;"></div>
+                <button onclick="resetTTT()" style="margin: 10px auto; display: block;">New Game</button>
+            `;
+            initTicTacToe();
+            break;
+            
+        case 'minesweeper':
+            document.getElementById('gameTitle').textContent = 'Minesweeper';
+            gameContent.innerHTML = `
+                <div class="game-info">Click to reveal cells. Right-click to flag.</div>
+                <div class="game-info" id="mineInfo">Mines: 10</div>
+                <div class="game-board" id="mineBoard" style="grid-template-columns: repeat(8, 40px); width: 340px;"></div>
+                <button onclick="resetMinesweeper()" style="margin: 10px auto; display: block;">New Game</button>
+            `;
+            initMinesweeper();
+            break;
+            
+        case 'snake':
+            document.getElementById('gameTitle').textContent = 'Snake';
+            gameContent.innerHTML = `
+                <div class="game-info" id="snakeInfo">Score: 0</div>
+                <canvas id="snakeCanvas" width="400" height="400" style="border: 2px solid #000; display: block; margin: 10px auto;"></canvas>
+                <div style="text-align: center;">Use Arrow Keys</div>
+                <button onclick="resetSnake()" style="margin: 10px auto; display: block;">New Game</button>
+            `;
+            initSnake();
+            break;
+    }
+}
+
+// TIC-TAC-TOE
+let tttBoard = ['', '', '', '', '', '', '', '', ''];
+let tttPlayer = 'X';
+let tttGameOver = false;
+
+function initTicTacToe() {
+    tttBoard = ['', '', '', '', '', '', '', '', ''];
+    tttPlayer = 'X';
+    tttGameOver = false;
+    const board = document.getElementById('tttBoard');
+    board.innerHTML = '';
+    for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'game-cell';
+        cell.style.width = '80px';
+        cell.style.height = '80px';
+        cell.onclick = () => playTTT(i);
+        board.appendChild(cell);
+    }
+}
+
+function playTTT(index) {
+    if (tttBoard[index] || tttGameOver) return;
+    
+    tttBoard[index] = tttPlayer;
+    const cells = document.getElementById('tttBoard').children;
+    cells[index].textContent = tttPlayer;
+    cells[index].style.color = tttPlayer === 'X' ? '#0000ff' : '#ff0000';
+    
+    if (checkTTTWin()) {
+        document.getElementById('tttInfo').textContent = `${tttPlayer} wins!`;
+        tttGameOver = true;
+        return;
+    }
+    
+    if (tttBoard.every(cell => cell)) {
+        document.getElementById('tttInfo').textContent = 'Draw!';
+        tttGameOver = true;
+        return;
+    }
+    
+    tttPlayer = tttPlayer === 'X' ? 'O' : 'X';
+    document.getElementById('tttInfo').textContent = `${tttPlayer}'s turn`;
+    
+    if (tttPlayer === 'O') {
+        setTimeout(aiTTT, 500);
+    }
+}
+
+function aiTTT() {
+    const empty = tttBoard.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+    if (empty.length > 0 && !tttGameOver) {
+        const move = empty[Math.floor(Math.random() * empty.length)];
+        playTTT(move);
+    }
+}
+
+function checkTTTWin() {
+    const wins = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
     ];
-
-    // ==================== SOCKET.IO CONNECTION ====================
-    // IMPORTANT: UPDATE THIS URL WITH YOUR RAILWAY DEPLOYMENT URL!
-    const socket = io("retrochat95-production.up.railway.app", {
-        transports: ["websocket", "polling"],
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: 10
+    return wins.some(combo => {
+        return tttBoard[combo[0]] && 
+               tttBoard[combo[0]] === tttBoard[combo[1]] && 
+               tttBoard[combo[0]] === tttBoard[combo[2]];
     });
+}
 
-    // ==================== WINDOW DRAGGING SYSTEM ====================
-    let isDragging = false;
-    let currentWindow = null;
-    let offsetX = 0;
-    let offsetY = 0;
-    let highestZIndex = 100;
+function resetTTT() {
+    initTicTacToe();
+}
 
-    function startDrag(e, windowElement) {
-        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
-        
-        isDragging = true;
-        currentWindow = windowElement;
-        
-        // Bring window to front
-        highestZIndex++;
-        currentWindow.style.zIndex = highestZIndex;
-        
-        const rect = currentWindow.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        
-        e.preventDefault();
-        e.stopPropagation();
-    }
+// MINESWEEPER
+let mineBoard = [];
+let mineRevealed = [];
+let mineFlagged = [];
+let mineCount = 10;
 
-    document.addEventListener('mousemove', (e) => {
-        if (isDragging && currentWindow) {
-            let newX = e.clientX - offsetX;
-            let newY = e.clientY - offsetY;
-            
-            // Keep window in bounds
-            const maxX = window.innerWidth - currentWindow.offsetWidth;
-            const maxY = window.innerHeight - currentWindow.offsetHeight - 40; // 40 for taskbar
-            
-            newX = Math.max(0, Math.min(newX, maxX));
-            newY = Math.max(0, Math.min(newY, maxY));
-            
-            currentWindow.style.left = newX + 'px';
-            currentWindow.style.top = newY + 'px';
+function initMinesweeper() {
+    mineBoard = Array(64).fill(0);
+    mineRevealed = Array(64).fill(false);
+    mineFlagged = Array(64).fill(false);
+    
+    let placed = 0;
+    while (placed < mineCount) {
+        const pos = Math.floor(Math.random() * 64);
+        if (mineBoard[pos] !== -1) {
+            mineBoard[pos] = -1;
+            placed++;
         }
-    });
-
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-        currentWindow = null;
-    });
-
-    // ==================== GLOBAL FUNCTIONS ====================
-
-    // LOGIN FUNCTION
-    function login(guestMode) {
-        const username = document.getElementById('usernameInput').value.trim();
-        const password = document.getElementById('passwordInput').value;
-        const color = document.getElementById('userColor').value;
-
-        if (!guestMode && !username) {
-            alert('Please enter a username!');
-            return;
-        }
-
-        if (!guestMode && username.length < 2) {
-            alert('Username must be at least 2 characters!');
-            return;
-        }
-
-        isGuest = guestMode;
-        currentUser = username;
-        userColor = color;
-
-        socket.emit('user-login', {
-            username: username,
-            color: color,
-            password: password,
-            isGuest: guestMode
-        });
-
-        document.getElementById('loginWindow').classList.remove('active');
-        document.getElementById('chatWindow').classList.add('active');
     }
-
-    // SEND MESSAGE
-    function sendMessage() {
-        const input = document.getElementById('messageInput');
-        const message = input.value.trim();
-        if (!message) return;
-
-        const now = new Date();
-        const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-        setTimeout(() => {
-            socket.emit('chat-message', {
-                message: message,
-                timestamp: time
-            });
-        }, messageDelay);
-
-        input.value = '';
-        socket.emit('stop-typing');
-    }
-
-    // TRIGGER IMAGE UPLOAD
-    function triggerImageUpload() {
-        document.getElementById('imageInput').click();
-    }
-
-    // SWITCH ROOM
-    function switchRoom(room) {
-        if (room === currentRoom) return;
-        
-        socket.emit('chat-message', {
-            message: `/join ${room}`,
-            timestamp: getCurrentTime()
-        });
-        
-        // Update UI
-        document.querySelectorAll('.room-tab').forEach(tab => {
-            tab.classList.remove('active');
-            if (tab.getAttribute('data-room') === room) {
-                tab.classList.add('active');
+    
+    for (let i = 0; i < 64; i++) {
+        if (mineBoard[i] !== -1) {
+            let count = 0;
+            const row = Math.floor(i / 8);
+            const col = i % 8;
+            for (let dr = -1; dr <= 1; dr++) {
+                for (let dc = -1; dc <= 1; dc++) {
+                    const nr = row + dr;
+                    const nc = col + dc;
+                    if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                        const ni = nr * 8 + nc;
+                        if (mineBoard[ni] === -1) count++;
+                    }
+                }
             }
-        });
-        
-        currentRoom = room;
-        document.getElementById('currentRoom').textContent = room;
-        document.getElementById('roomInfo').textContent = `Room: #${room}`;
-    }
-
-    // SHOW WINDOWS
-    function showAbout() { 
-        closeAllDropdowns();
-        document.getElementById('aboutWindow').classList.add('active'); 
+            mineBoard[i] = count;
+        }
     }
     
-    function showSettings() {
-        closeAllDropdowns();
-        document.getElementById('settingsWindow').classList.add('active');
-        document.getElementById('settingsColor').value = userColor;
-        document.getElementById('settingsUsername').value = currentUser;
-    }
-
-    function showAchievements() {
-        closeAllDropdowns();
-        updateAchievementsList();
-        document.getElementById('achievementsWindow').classList.add('active');
-    }
-
-    function showHelp() {
-        closeAllDropdowns();
-        document.getElementById('helpWindow').classList.add('active');
-    }
-    
-    function closeWindow(id) { 
-        document.getElementById(id).classList.remove('active'); 
-    }
-    
-    function minimizeWindow(id) { 
-        document.getElementById(id).classList.remove('active'); 
-    }
-    
-    function focusWindow(id) { 
-        const win = document.getElementById(id);
-        win.classList.add('active');
-        highestZIndex++;
-        win.style.zIndex = highestZIndex;
-    }
-    
-    function openChatWindow() { 
-        focusWindow('chatWindow');
-    }
-
-    // TOGGLE START MENU
-    function toggleStartMenu() {
-        const menu = document.getElementById('startMenu');
-        menu.classList.toggle('show');
-    }
-
-    // TOGGLE DROPDOWN
-    function toggleDropdown(id) {
-        const dropdown = document.getElementById(id);
-        document.querySelectorAll('.dropdown').forEach(d => {
-            if (d.id !== id) d.classList.remove('show');
-        });
-        dropdown.classList.toggle('show');
-    }
-
-    function closeAllDropdowns() {
-        document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
-    }
-
-    // UPDATE BORDER COLOR
-    function updateBorderColor(color) {
-        document.querySelectorAll('.title-bar').forEach(bar => {
-            bar.style.background = `linear-gradient(to right, ${color}, ${adjustColor(color, 30)})`;
-        });
-    }
-
-    // ADJUST COLOR HELPER
-    function adjustColor(color, percent) {
-        const num = parseInt(color.replace("#", ""), 16);
-        const amt = Math.round(2.55 * percent);
-        const R = (num >> 16) + amt;
-        const G = (num >> 8 & 0x00FF) + amt;
-        const B = (num & 0x0000FF) + amt;
-        return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255))
-            .toString(16).slice(1);
-    }
-
-    // SAVE SETTINGS
-    function saveSettings() {
-        const newColor = document.getElementById('settingsColor').value;
-        if (newColor !== userColor) {
-            userColor = newColor;
-            socket.emit('chat-message', {
-                message: `/color ${newColor}`,
-                timestamp: getCurrentTime()
-            });
-        }
-        
-        const borderColor = document.getElementById('borderColor').value;
-        updateBorderColor(borderColor);
-        
-        const newStatus = document.getElementById('statusSelect').value;
-        if (newStatus !== userStatus) {
-            userStatus = newStatus;
-            socket.emit('chat-message', {
-                message: `/status ${newStatus}`,
-                timestamp: getCurrentTime()
-            });
-        }
-        
-        pixelationLevel = parseInt(document.getElementById('pixelLevel').value);
-        messageDelay = parseInt(document.getElementById('messageDelay').value);
-        
-        const crtEnabled = document.getElementById('crtToggle').checked;
-        if (crtEnabled) {
-            document.body.classList.add('crt-mode');
-        } else {
-            document.body.classList.remove('crt-mode');
-        }
-        
-        alert('Settings saved successfully!');
-        closeWindow('settingsWindow');
-    }
-
-    // CLEAR CHAT
-    function clearChat() {
-        closeAllDropdowns();
-        if (confirm('Clear your local chat history? (This only clears YOUR view)')) {
-            socket.emit('chat-message', {
-                message: '/clear',
-                timestamp: getCurrentTime()
-            });
-        }
-    }
-
-    // DOWNLOAD CHAT LOG
-    function downloadChatLog() {
-        closeAllDropdowns();
-        const messagesArea = document.getElementById('messagesArea');
-        const text = messagesArea.innerText;
-        const blob = new Blob([text], { type: 'text/plain' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `retrochat95-log-${Date.now()}.txt`;
-        a.click();
-        showNotification('Chat log downloaded!');
-    }
-
-    // TOGGLE CRT MODE
-    function toggleCRTMode() {
-        document.body.classList.toggle('crt-mode');
-        const isOn = document.body.classList.contains('crt-mode');
-        document.getElementById('crtToggle').checked = isOn;
-    }
-
-    // UPDATE ACHIEVEMENTS LIST
-    function updateAchievementsList() {
-        const list = document.getElementById('achievementsList');
-        list.innerHTML = '';
-        
-        if (allAchievements.length === 0) {
-            list.innerHTML = '<p style="text-align: center; color: #808080;">No achievements yet!</p>';
-            return;
-        }
-        
-        allAchievements.forEach(ach => {
-            const unlocked = achievements.includes(ach.id);
-            const item = document.createElement('div');
-            item.className = `achievement-item ${unlocked ? '' : 'locked'}`;
-            item.innerHTML = `
-                <div class="achievement-item-title">${unlocked ? '[!]' : '[?]'} ${ach.title}</div>
-                <div class="achievement-item-desc">${ach.desc}</div>
-            `;
-            list.appendChild(item);
-        });
-    }
-
-    // SEND PM
-    function sendPM() {
-        const input = document.getElementById('pmInput');
-        const message = input.value.trim();
-        if (!message || !pmTarget) return;
-
-        socket.emit('chat-message', {
-            message: `/msg ${pmTarget} ${message}`,
-            timestamp: getCurrentTime()
-        });
-
-        // Add to PM window
-        const pmMessages = document.getElementById('pmMessages');
-        const msgDiv = document.createElement('div');
-        msgDiv.style.marginBottom = '5px';
-        msgDiv.innerHTML = `<strong>You:</strong> ${escapeHtml(message)}`;
-        pmMessages.appendChild(msgDiv);
-        pmMessages.scrollTop = pmMessages.scrollHeight;
-
-        input.value = '';
-    }
-
-    // SHOW PM WINDOW
-    function showPMWindow(username) {
-        pmTarget = username;
-        document.getElementById('pmTarget').textContent = username;
-        document.getElementById('pmMessages').innerHTML = '';
-        document.getElementById('pmWindow').classList.add('active');
-    }
-
-    // WIN95 ERROR
-    function closeWin95Error() {
-        document.getElementById('win95Error').classList.remove('show');
-    }
-
-    // ESCAPE HTML
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // GET CURRENT TIME
-    function getCurrentTime() {
-        const now = new Date();
-        return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    }
-
-    // ==================== DOM READY ====================
-    document.addEventListener("DOMContentLoaded", () => {
-
-        // CLOCK
-        function updateClock() {
-            const now = new Date();
-            const hours = now.getHours() % 12 || 12;
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-            document.getElementById('clock').textContent = `${hours}:${minutes} ${ampm}`;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // SLIDERS
-        document.getElementById('messageDelay').addEventListener('input', function(e) {
-            document.getElementById('delayValue').textContent = e.target.value;
-        });
-
-        document.getElementById('pixelLevel').addEventListener('input', function(e) {
-            document.getElementById('pixelValue').textContent = e.target.value;
-            pixelationLevel = parseInt(e.target.value);
-        });
-
-        // ADD MESSAGE FUNCTION
-        function addMessage(username, text, color, timestamp, status = 'Online') {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message';
-
-            const statusDot = status === 'Online' ? '&#9679;' : status === 'Away' ? '&#9711;' : '&#9679;';
-            const statusColor = status === 'Online' ? '#00ff00' : status === 'Away' ? '#ffff00' : '#ff0000';
-
-            // Highlight @mentions
-            let messageText = escapeHtml(text);
-            if (messageText.includes('@' + currentUser)) {
-                messageText = messageText.replace(
-                    new RegExp('@' + escapeHtml(currentUser), 'g'), 
-                    `<span class="message-highlight">@${escapeHtml(currentUser)}</span>`
-                );
-            }
-
-            messageDiv.innerHTML = `
-                <div class="message-header">
-                    <span style="color: ${statusColor};">${statusDot}</span>
-                    <span style="color: ${color};">${escapeHtml(username)}</span>
-                    <span class="timestamp">[${timestamp}]</span>
-                    <button class="reaction-button" onclick="reactToMessage(this)">+1 (0)</button>
-                </div>
-                <div class="message-content">${messageText}</div>
-            `;
-
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-
-            messageCount++;
-            document.getElementById('messageCount').textContent = `Messages: ${messageCount}`;
-
-            if (username !== currentUser) {
-                showNotification(`${username}: ${text.substring(0, 40)}...`);
-            }
-        }
-        window.addMessage = addMessage;
-
-        // REACT TO MESSAGE
-        window.reactToMessage = function(button) {
-            const match = button.textContent.match(/\d+/);
-            const currentCount = match ? parseInt(match[0]) : 0;
-            button.textContent = `+1 (${currentCount + 1})`;
-            socket.emit('add-reaction', {
-                messageId: Date.now(),
-                reaction: 'thumbsup'
-            });
+    const board = document.getElementById('mineBoard');
+    board.innerHTML = '';
+    for (let i = 0; i < 64; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'game-cell';
+        cell.style.width = '40px';
+        cell.style.height = '40px';
+        cell.onclick = () => revealMine(i);
+        cell.oncontextmenu = (e) => {
+            e.preventDefault();
+            flagMine(i);
         };
+        board.appendChild(cell);
+    }
+}
 
-        // ADD SYSTEM MESSAGE
-        function addSystemMessage(text) {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message message-system';
-            messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-        }
-        window.addSystemMessage = addSystemMessage;
-
-        // ADD ERROR MESSAGE
-        function addErrorMessage(text) {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message message-error';
-            messageDiv.innerHTML = `<div class="message-content">[ERROR] ${escapeHtml(text)}</div>`;
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-        }
-        window.addErrorMessage = addErrorMessage;
-
-        // ADD ACTION MESSAGE
-        function addActionMessage(username, action, color, timestamp) {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message message-action';
-            messageDiv.innerHTML = `
-                <div class="message-content">
-                    <span class="timestamp">[${timestamp}]</span>
-                    <em style="color: ${color};">* ${escapeHtml(username)} ${escapeHtml(action)}</em>
-                </div>
-            `;
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-        }
-
-        // ADD IMAGE MESSAGE
-        function addImageMessage(username, imageData, color, timestamp) {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message';
-            messageDiv.innerHTML = `
-                <div class="message-header">
-                    <span style="color: ${color};">${escapeHtml(username)}</span>
-                    <span class="timestamp">[${timestamp}]</span>
-                </div>
-                <div class="message-content">
-                    <img src="${imageData}" class="message-image" onclick="window.open(this.src)" title="Click to view full size">
-                </div>
-            `;
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-            messageCount++;
-            document.getElementById('messageCount').textContent = `Messages: ${messageCount}`;
-        }
-
-        // HANDLE IMAGE UPLOAD
-        document.getElementById('imageInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Image is too large! Maximum size is 5MB.');
-                return;
+function revealMine(index) {
+    if (mineRevealed[index] || mineFlagged[index]) return;
+    
+    mineRevealed[index] = true;
+    const cells = document.getElementById('mineBoard').children;
+    const cell = cells[index];
+    
+    if (mineBoard[index] === -1) {
+        cell.textContent = '*';
+        cell.style.background = '#ff0000';
+        alert('Game Over!');
+        for (let i = 0; i < 64; i++) {
+            if (mineBoard[i] === -1) {
+                cells[i].textContent = '*';
+                cells[i].style.background = '#ff0000';
             }
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                pixelateImage(e.target.result);
-            };
-            reader.readAsDataURL(file);
-        });
-
-        function pixelateImage(imageData) {
-            const canvas = document.getElementById('pixelCanvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-
-            img.onload = function () {
-                const maxWidth = 500;
-                const maxHeight = 500;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > maxWidth) {
-                    height = (maxWidth / width) * height;
-                    width = maxWidth;
+        }
+        return;
+    }
+    
+    cell.style.background = '#ffffff';
+    if (mineBoard[index] > 0) {
+        cell.textContent = mineBoard[index];
+    }
+    
+    if (mineBoard[index] === 0) {
+        const row = Math.floor(index / 8);
+        const col = index % 8;
+        for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                const nr = row + dr;
+                const nc = col + dc;
+                if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8) {
+                    const ni = nr * 8 + nc;
+                    if (!mineRevealed[ni]) {
+                        revealMine(ni);
+                    }
                 }
-                if (height > maxHeight) {
-                    width = (maxHeight / height) * width;
-                    height = maxHeight;
-                }
-
-                const pixelSize = pixelationLevel * 2;
-                const smallWidth = Math.ceil(width / pixelSize);
-                const smallHeight = Math.ceil(height / pixelSize);
-
-                canvas.width = smallWidth;
-                canvas.height = smallHeight;
-                ctx.drawImage(img, 0, 0, smallWidth, smallHeight);
-
-                const pixelatedData = canvas.toDataURL('image/png');
-
-                socket.emit('image-upload', {
-                    imageData: pixelatedData,
-                    timestamp: getCurrentTime()
-                });
-            };
-
-            img.src = imageData;
+            }
         }
+    }
+}
 
-        // CLOSE MENUS
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.menu-item')) {
-                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
-            }
-            if (!e.target.closest('.start-menu') && !e.target.closest('.start-button')) {
-                document.getElementById('startMenu').classList.remove('show');
-            }
-        });
+function flagMine(index) {
+    if (mineRevealed[index]) return;
+    
+    mineFlagged[index] = !mineFlagged[index];
+    const cells = document.getElementById('mineBoard').children;
+    cells[index].textContent = mineFlagged[index] ? 'F' : '';
+}
 
-        // UPDATE USERS LIST
-        function updateUsersList() {
-            const usersList = document.getElementById('usersList');
-            usersList.innerHTML = users.map(u => `
-                <div class="user-item">
-                    <div class="user-status online"></div>
-                    ${escapeHtml(u)}
-                </div>
-            `).join('');
-            document.getElementById('userCount').textContent = `Users: ${users.length}`;
-        }
-        window.updateUsersList = updateUsersList;
+function resetMinesweeper() {
+    initMinesweeper();
+}
 
-        // SHOW NOTIFICATION
-        function showNotification(text) {
-            const notif = document.getElementById('notification');
-            if (!document.getElementById('notifToggle').checked) return;
-            document.getElementById('notificationText').textContent = text;
-            notif.classList.add('show');
-            setTimeout(() => notif.classList.remove('show'), 3000);
-        }
-        window.showNotification = showNotification;
+// SNAKE
+let snake = [{x: 10, y: 10}];
+let snakeDir = {x: 1, y: 0};
+let snakeFood = {x: 15, y: 15};
+let snakeScore = 0;
+let snakeInterval;
 
-        // ACHIEVEMENT POPUP
-        function showAchievement(title, desc) {
-            const popup = document.getElementById('achievementPopup');
-            document.getElementById('achievementDesc').textContent = `${title} - ${desc}`;
-            popup.classList.add('show');
-            setTimeout(() => popup.classList.remove('show'), 5000);
-        }
-        window.showAchievement = showAchievement;
+function initSnake() {
+    snake = [{x: 10, y: 10}];
+    snakeDir = {x: 1, y: 0};
+    snakeFood = {x: 15, y: 15};
+    snakeScore = 0;
+    document.getElementById('snakeInfo').textContent = 'Score: 0';
+    
+    if (snakeInterval) clearInterval(snakeInterval);
+    snakeInterval = setInterval(updateSnake, 150);
+    
+    document.addEventListener('keydown', handleSnakeKey);
+}
 
-        // ENTER TO SEND
-        document.getElementById('messageInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
+function handleSnakeKey(e) {
+    switch(e.key) {
+        case 'ArrowUp': if (snakeDir.y === 0) snakeDir = {x: 0, y: -1}; break;
+        case 'ArrowDown': if (snakeDir.y === 0) snakeDir = {x: 0, y: 1}; break;
+        case 'ArrowLeft': if (snakeDir.x === 0) snakeDir = {x: -1, y: 0}; break;
+        case 'ArrowRight': if (snakeDir.x === 0) snakeDir = {x: 1, y: 0}; break;
+    }
+}
 
-        // PM ENTER TO SEND
-        document.getElementById('pmInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendPM();
-            }
-        });
+function updateSnake() {
+    const head = {x: snake[0].x + snakeDir.x, y: snake[0].y + snakeDir.y};
+    
+    if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || 
+        snake.some(s => s.x === head.x && s.y === head.y)) {
+        clearInterval(snakeInterval);
+        alert('Game Over! Score: ' + snakeScore);
+        return;
+    }
+    
+    snake.unshift(head);
+    
+    if (head.x === snakeFood.x && head.y === snakeFood.y) {
+        snakeScore++;
+        document.getElementById('snakeInfo').textContent = 'Score: ' + snakeScore;
+        snakeFood = {
+            x: Math.floor(Math.random() * 20),
+            y: Math.floor(Math.random() * 20)
+        };
+    } else {
+        snake.pop();
+    }
+    
+    drawSnake();
+}
 
-        // TYPING INDICATOR
-        document.getElementById('messageInput').addEventListener('input', function() {
-            socket.emit('typing');
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => {
-                socket.emit('stop-typing');
-            }, 1000);
-        });
-
-        updateUsersList();
-
-        // ==================== SOCKET.IO EVENTS ====================
-
-        socket.on('connect', () => {
-            console.log('[Connected] Socket.IO connected');
-            document.getElementById('statusText').textContent = 'Connected';
-            document.getElementById('statusText').style.color = '#00ff00';
-        });
-
-        socket.on('disconnect', () => {
-            console.log('[Disconnected] Socket.IO disconnected');
-            document.getElementById('statusText').textContent = 'Disconnected';
-            document.getElementById('statusText').style.color = '#ff0000';
-        });
-
-        socket.on('connect_error', (error) => {
-            console.error('[Connection Error]', error);
-            document.getElementById('statusText').textContent = 'Connection Error';
-            document.getElementById('statusText').style.color = '#ff0000';
-        });
-
-        socket.on('chat-message', data => {
-            addMessage(data.username, data.message, data.color, data.timestamp, data.status);
-        });
-        
-        socket.on('image-message', data => {
-            addImageMessage(data.username, data.imageData, data.color, data.timestamp);
-        });
-
-        socket.on('image-keyword', data => {
-            addImageMessage(data.username, data.imageUrl, data.color, data.timestamp);
-        });
-
-        socket.on('action-message', data => {
-            addActionMessage(data.username, data.action, data.color, data.timestamp);
-        });
-
-        socket.on('system-message', data => {
-            addSystemMessage(data.text);
-        });
-
-        socket.on('user-joined', data => {
-            addSystemMessage(`${data.username} has entered the chat.`);
-        });
-
-        socket.on('user-left', data => {
-            addSystemMessage(`${data.username} has left the chat.`);
-        });
-
-        socket.on('users-update', list => { 
-            users = list; 
-            updateUsersList(); 
-        });
-
-        socket.on('user-typing', data => {
-            document.getElementById('typingIndicator').textContent = `${data.username} is typing...`;
-        });
-
-        socket.on('user-stop-typing', () => {
-            document.getElementById('typingIndicator').textContent = '';
-        });
-
-        socket.on('achievement-unlocked', data => {
-            if (!achievements.includes(data.title.toLowerCase().replace(/ /g, '-').replace(/!/g, ''))) {
-                achievements.push(data.title.toLowerCase().replace(/ /g, '-').replace(/!/g, ''));
-            }
-            showAchievement(data.title, data.description);
-            updateAchievementsList();
-        });
-
-        socket.on('achievements-update', data => {
-            achievements = data || [];
-            updateAchievementsList();
-        });
-
-        socket.on('win95-error', message => {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('win95Error').classList.add('show');
-            setTimeout(() => closeWin95Error(), 5000);
-        });
-
-        socket.on('color-changed', color => {
-            userColor = color;
-            document.getElementById('settingsColor').value = color;
-        });
-
-        socket.on('clear-chat', () => {
-            document.getElementById('messagesArea').innerHTML = '';
-            addSystemMessage('Chat cleared.');
-            messageCount = 0;
-        });
-
-        socket.on('room-changed', room => {
-            currentRoom = room;
-            document.getElementById('currentRoom').textContent = room;
-            document.getElementById('messagesArea').innerHTML = '';
-            addSystemMessage(`Joined room: #${room}`);
-            messageCount = 0;
-        });
-
-        socket.on('private-message', data => {
-            showPMWindow(data.from);
-            const pmMessages = document.getElementById('pmMessages');
-            const msgDiv = document.createElement('div');
-            msgDiv.style.marginBottom = '5px';
-            msgDiv.innerHTML = `<strong style="color: ${data.color};">${escapeHtml(data.from)}:</strong> ${escapeHtml(data.message)}`;
-            pmMessages.appendChild(msgDiv);
-            pmMessages.scrollTop = pmMessages.scrollHeight;
-            showNotification(`PM from ${data.from}: ${data.message}`);
-        });
-
-        socket.on('private-message-sent', data => {
-            showNotification(`PM sent to ${data.to}`);
-        });
-
-        socket.on('message-blocked', message => {
-            addErrorMessage(message);
-        });
-
-        socket.on('command-error', message => {
-            addErrorMessage(message);
-        });
-
-        socket.on('login-error', message => {
-            alert('Login Error: ' + message);
-            document.getElementById('loginWindow').classList.add('active');
-            document.getElementById('chatWindow').classList.remove('active');
-        });
-
-        socket.on('message-history', messages => {
-            if (!messages || messages.length === 0) return;
-            
-            messages.forEach(msg => {
-                if (msg.message_type === 'normal') {
-                    addMessage(msg.username, msg.message, msg.color, msg.timestamp);
-                } else if (msg.message_type === 'action') {
-                    addActionMessage(msg.username, msg.message, msg.color, msg.timestamp);
-                } else if (msg.message_type === 'image') {
-                    addSystemMessage(`${msg.username} posted an image: ${msg.message}`);
-                }
-            });
-            
-            addSystemMessage('--- End of message history ---');
-        });
-
-        socket.on('reaction-added', data => {
-            // Handle reaction updates if needed
-        });
-
+function drawSnake() {
+    const canvas = document.getElementById('snakeCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    ctx.fillStyle = '#c0c0c0';
+    ctx.fillRect(0, 0, 400, 400);
+    
+    ctx.fillStyle = '#00ff00';
+    snake.forEach(s => {
+        ctx.fillRect(s.x * 20, s.y * 20, 18, 18);
     });
+    
+    ctx.fillStyle = '#ff0000';
+    ctx.fillRect(snakeFood.x * 20, snakeFood.y * 20, 18, 18);
+}
+
+function resetSnake() {
+    if (snakeInterval) clearInterval(snakeInterval);
+    initSnake();
+}
+
+// ============================================================================
+// APPS
+// ============================================================================
+
+// NOTEPAD
+function downloadNotepad() {
+    const text = document.getElementById('notepadText').value;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'note.txt';
+    a.click();
+}
+
+function clearNotepad() {
+    if (confirm('Clear notepad?')) {
+        document.getElementById('notepadText').value = '';
+    }
+}
+
+// PAINT
+let paintCanvas, paintCtx, paintColor = '#000000', isPainting = false;
+
+window.addEventListener('load', () => {
+    paintCanvas = document.getElementById('paintCanvas');
+    paintCtx = paintCanvas.getContext('2d');
+    
+    paintCanvas.addEventListener('mousedown', (e) => {
+        isPainting = true;
+        paint(e);
+    });
+    
+    paintCanvas.addEventListener('mousemove', (e) => {
+        if (isPainting) paint(e);
+    });
+    
+    paintCanvas.addEventListener('mouseup', () => {
+        isPainting = false;
+    });
+});
+
+function paint(e) {
+    const rect = paintCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    paintCtx.fillStyle = paintColor;
+    paintCtx.fillRect(x - 5, y - 5, 10, 10);
+}
+
+function setPaintColor(color) {
+    paintColor = color;
+}
+
+function clearPaint() {
+    if (confirm('Clear canvas?')) {
+        paintCtx.fillStyle = '#ffffff';
+        paintCtx.fillRect(0, 0, 660, 480);
+    }
+}
+
+// CALCULATOR
+let calcValue = '0';
+let calcOperator = null;
+let calcWaitingForOperand = false;
+
+function calcInput(value) {
+    if (calcWaitingForOperand) {
+        calcValue = value;
+        calcWaitingForOperand = false;
+    } else {
+        calcValue = calcValue === '0' ? value : calcValue + value;
+    }
+    document.getElementById('calcDisplay').value = calcValue;
+}
+
+function calcEquals() {
+    try {
+        calcValue = String(eval(calcValue));
+        document.getElementById('calcDisplay').value = calcValue;
+        calcWaitingForOperand = true;
+    } catch(e) {
+        calcValue = '0';
+        document.getElementById('calcDisplay').value = 'Error';
+    }
+}
+
+function calcClear() {
+    calcValue = '0';
+    calcOperator = null;
+    calcWaitingForOperand = false;
+    document.getElementById('calcDisplay').value = '0';
+}
+
+// SCREENSAVER
+let screensaverInterval;
+
+function startScreenSaver() {
+    const ss = document.getElementById('screensaver');
+    const text = document.getElementById('screensaverText');
+    ss.classList.add('active');
+    
+    let x = Math.random() * (window.innerWidth - 200);
+    let y = Math.random() * (window.innerHeight - 50);
+    let dx = 2;
+    let dy = 2;
+    
+    screensaverInterval = setInterval(() => {
+        x += dx;
+        y += dy;
+        
+        if (x <= 0 || x >= window.innerWidth - 200) dx = -dx;
+        if (y <= 0 || y >= window.innerHeight - 50) dy = -dy;
+        
+        text.style.left = x + 'px';
+        text.style.top = y + 'px';
+    }, 20);
+}
+
+function stopScreenSaver() {
+    clearInterval(screensaverInterval);
+    document.getElementById('screensaver').classList.remove('active');
+}
+
+// ============================================================================
+// SOCKET EVENTS
+// ============================================================================
+
+socket.on('connect', () => {
+    console.log('[Connected]');
+    document.getElementById('statusText').textContent = 'Connected';
+});
+
+socket.on('disconnect', () => {
+    console.log('[Disconnected]');
+    document.getElementById('statusText').textContent = 'Disconnected';
+});
+
+socket.on('chat-message', data => {
+    addMessage(data.username, data.message, data.color, data.timestamp);
+});
+
+socket.on('image-message', data => {
+    addImageMessage(data.username, data.imageData, data.color, data.timestamp);
+});
+
+socket.on('image-keyword', data => {
+    addImageMessage(data.username, data.imageUrl, data.color, data.timestamp);
+});
+
+socket.on('system-message', data => {
+    addSystemMessage(data.text);
+});
+
+socket.on('users-update', list => {
+    users = list;
+    updateUsersList();
+});
+
+socket.on('user-typing', data => {
+    document.getElementById('typingIndicator').textContent = `${data.username} is typing...`;
+});
+
+socket.on('user-stop-typing', () => {
+    document.getElementById('typingIndicator').textContent = '';
+});
+
+socket.on('achievement-unlocked', data => {
+    showAchievement(data.title, data.description);
+});
+
+socket.on('win95-error', message => {
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('win95Error').classList.add('show');
+    setTimeout(closeWin95Error, 5000);
+});
+
+socket.on('clear-chat', () => {
+    document.getElementById('messagesArea').innerHTML = '';
+    addSystemMessage('Chat cleared.');
+});
+
+// FIX FOR BUG #2 and #3: Restore saved messages when room changes
+socket.on('room-changed', room => {
+    currentRoom = room;
+    document.getElementById('currentRoom').textContent = room;
+    document.getElementById('roomInfo').textContent = `Room: #${room}`;
+    
+    const messagesArea = document.getElementById('messagesArea');
+    if (roomMessages[room]) {
+        messagesArea.innerHTML = roomMessages[room];
+    } else {
+        messagesArea.innerHTML = '';
+    }
+    
+    if (!roomMessages[room]) {
+        addSystemMessage(`Joined room: #${room}`);
+    }
+    
+    messagesArea.scrollTop = messagesArea.scrollHeight;
+});
+
+// FIX FOR BUG #1: Mark history messages so they don't trigger notifications
+socket.on('message-history', messages => {
+    if (!messages || messages.length === 0) return;
+    
+    messages.forEach(msg => {
+        if (msg.message_type === 'normal') {
+            addMessage(msg.username, msg.message, msg.color, msg.timestamp, true); // true = isHistory
+        } else if (msg.message_type === 'image-upload') {
+            addSystemMessage(`${msg.username} posted an image`);
+        }
+    });
+    
+    addSystemMessage('--- End of message history ---');
+    
+    const messagesArea = document.getElementById('messagesArea');
+    roomMessages[currentRoom] = messagesArea.innerHTML;
+});
+
+socket.on('private-message', data => {
+    showNotification(`PM from ${data.from}: ${data.message}`);
+});
+
+socket.on('message-blocked', message => {
+    addErrorMessage(message);
+});
+
+socket.on('command-error', message => {
+    addErrorMessage(message);
+});
+
+socket.on('login-error', message => {
+    alert('Login Error: ' + message);
+    openWindow('loginWindow');
+    closeWindow('chatWindow');
+});
+
+// ============================================================================
+// INPUT HANDLING
+// ============================================================================
+
+document.getElementById('messageInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
+
+document.getElementById('messageInput').addEventListener('input', () => {
+    socket.emit('typing');
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+        socket.emit('stop-typing');
+    }, 1000);
+});
+
+// CLOCK
+function updateClock() {
+    const now = new Date();
+    const hours = now.getHours() % 12 || 12;
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+    document.getElementById('clock').textContent = `${hours}:${minutes} ${ampm}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// CLOSE MENUS ON CLICK
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.menu-item')) {
+        closeAllDropdowns();
+    }
+    if (!e.target.closest('.start-menu') && !e.target.closest('.start-button')) {
+        document.getElementById('startMenu').classList.remove('show');
+    }
+});
+
+console.log('RetroChat95 v1.0 ULTIMATE - Loaded!');
 </script>
 </body>
 </html>
