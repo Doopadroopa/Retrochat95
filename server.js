@@ -29,7 +29,7 @@ let rooms = {
     'random': { users: [], messages: [] },
     'images': { users: [], messages: [] },
     'windows': { users: [], messages: [] }
-});
+}; // FIXED: Changed ) to }
 
 const emotes = {
     'dog': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/2-20933_cute-puppies-png-background-havanese-dog.png',
@@ -50,7 +50,7 @@ const win95Errors = [
     "The system is dangerously low on resources!",
     "Cannot find KERNEL32.DLL",
     "GPF in module MSVCRT.DLL at 0137:BFF9B3BC"
-]);
+]; // FIXED: Changed ) to ]
 
 io.on('connection', (socket) => {
     console.log('Connection:', socket.id);
@@ -64,7 +64,7 @@ io.on('connection', (socket) => {
         achievements: [],
         messageCount: 0,
         joinTime: Date.now()
-    });
+    }; // FIXED: Changed ) to }
 
     // USER LOGIN / REGISTER
     socket.on('user-login', (data) => {
