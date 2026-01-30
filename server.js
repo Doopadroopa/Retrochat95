@@ -33,13 +33,13 @@ let rooms = {
 
 // EMOTE IMAGES (base64 or URLs)
 const emotes = {
-    'dog': 'https://i.imgur.com/placeholder-dog.png',
-    'cat': 'https://i.imgur.com/placeholder-cat.png',
-    'lol': 'https://i.imgur.com/placeholder-lol.png',
-    'windows': 'https://i.imgur.com/placeholder-windows.png',
-    'error': 'https://i.imgur.com/placeholder-error.png',
-    'cool': 'https://i.imgur.com/placeholder-cool.png',
-    'fire': 'https://i.imgur.com/placeholder-fire.png'
+    'dog': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/2-20933_cute-puppies-png-background-havanese-dog.png',
+    'cat': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/cat.png',
+    'lol': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/laugh.png',
+    'windows': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/windows95box.0.png',
+    'error': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/error.png',
+    'cool': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/Derp-face.png',
+    'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/pixel-art-fire-icon-png.png'
 };
 
 // FAKE WIN95 ERRORS
