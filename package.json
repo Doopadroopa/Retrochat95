@@ -1,16 +1,40 @@
 {
-  "name": "retrochatroom95",
+  "name": "retrochat95",
   "version": "1.0.0",
-  "description": "A retro Windows 95 style chat room",
+  "description": "RetroChat95 v1.0 - Official Release - The kewlest Windows 95 style chat room with real-time messaging,",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server-FINAL.js",
+    "dev": "nodemon server-FINAL.js",
+    "test": "echo \"No tests configured\" && exit 0"
   },
+  "keywords": [
+    "chat",
+    "socket.io",
+    "retro",
+    "windows95",
+    "real-time",
+    "database",
+    "sqlite",
+    "messaging",
+    "achievements"
+  ],
+  "author": "Tricarty",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "socket.io": "^4.6.1"
+    "socket.io": "^4.6.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/Retrochat95.git"
   }
 }
