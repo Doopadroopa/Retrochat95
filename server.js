@@ -31,7 +31,6 @@ let rooms = {
     'windows': { users: [], messages: [] }
 });
 
-// EMOTE IMAGES (base64 or URLs)
 const emotes = {
     'dog': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/2-20933_cute-puppies-png-background-havanese-dog.png',
     'cat': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/cat.png',
@@ -39,8 +38,9 @@ const emotes = {
     'windows': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/windows95box.0.png',
     'error': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/error.png',
     'cool': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/Derp-face.png',
-    'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/pixel-art-fire-icon-png.png'
-});
+    'fire': 'https://raw.githubusercontent.com/Doopadroopa/retrochatemotes/refs/heads/main/pixel-art-fire-icon-png.png'
+};
+
 
 // FAKE WIN95 ERRORS
 const win95Errors = [
