@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetroChat95 v1.0 - Official Release</title>
+    <title>RetroChat95 (BETA)</title>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js" crossorigin="anonymous"></script>
     <style>
         /* ====== RESET ====== */
@@ -763,13 +763,13 @@
         <!-- Desktop Icon -->
         <div class="desktop-icon" ondblclick="openChatWindow()">
             <div class="desktop-icon-image">&#128172;</div>
-            <div class="desktop-icon-label">RetroChat95<br>v1.0</div>
+            <div class="desktop-icon-label">RetroChat95<br>(BETA)</div>
         </div>
 
         <!-- Login Window -->
         <div class="window login-window active" id="loginWindow">
             <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">RetroChat95 v1.0 - Login</div>
+                <div class="title-bar-text">RetroChat95 (BETA) - Login</div>
             </div>
             <div class="window-body">
                 <div class="login-form">
@@ -804,7 +804,7 @@
         <!-- Main Chat Window -->
         <div class="window chat-window" id="chatWindow">
             <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">RetroChat95 v1.0 - #<span id="currentRoom">general</span></div>
+                <div class="title-bar-text">RetroChat95 BETA - #<span id="currentRoom">general</span></div>
                 <div class="title-bar-controls">
                     <button onclick="minimizeWindow('chatWindow')">_</button>
                     <button onclick="closeWindow('chatWindow')">X</button>
@@ -855,7 +855,7 @@
                     <div class="messages-area" id="messagesArea">
                         <div class="message message-system">
                             <div class="message-content">
-                                Welcome to RetroChat95 v1.0! Type /help to see all commands.
+                                Welcome to RetroChat95 BETA Type /help to see all commands.
                             </div>
                         </div>
                     </div>
@@ -882,7 +882,7 @@
         <!-- About Window -->
         <div class="window about-window" id="aboutWindow">
             <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">About RetroChat95 v1.0</div>
+                <div class="title-bar-text">About RetroChat95 BETA</div>
                 <div class="title-bar-controls">
                     <button onclick="closeWindow('aboutWindow')">X</button>
                 </div>
@@ -890,7 +890,7 @@
             <div class="window-body">
                 <div class="about-content">
                     <h1>RetroChat95</h1>
-                    <p><strong>Version:</strong> 1.0 - Official Release</p>
+                    <p><strong>Version:</strong>BETA RELEASE</p>
                     <p><strong>Released:</strong> January 2026</p>
                     <p style="margin-top: 15px;">The kewlest chat experience on the web!</p>
                     
@@ -906,7 +906,7 @@
                         [x] Message reactions<br>
                         [x] CRT mode effect<br>
                         [x] Draggable windows<br>
-                        [x] Pure 90s nostalgia
+                        [x] Windows 95 theme
                     </p>
                     
                     <button onclick="closeWindow('aboutWindow')" style="margin-top: 25px;">OK</button>
@@ -1103,7 +1103,7 @@
                 <div class="start-menu-item" onclick="downloadChatLog(); toggleStartMenu();">Download Log</div>
                 <div class="start-menu-item" onclick="clearChat(); toggleStartMenu();">Clear Chat</div>
             </div>
-            <button class="window-button" onclick="focusWindow('chatWindow')">RetroChat95 v1.0</button>
+            <button class="window-button" onclick="focusWindow('chatWindow')">RetroChat95 BETA</button>
             <div class="clock" id="clock">12:00 PM</div>
         </div>
     </div>
@@ -1111,7 +1111,7 @@
     <canvas id="pixelCanvas" class="pixel-canvas"></canvas>
 
 <script>
-    // ==================== RETROCHAT95 v1.0 - CLIENT JAVASCRIPT ====================
+    // ==================== RETROCHAT95 BETA - CLIENT JAVASCRIPT ====================
     
     // GLOBAL VARIABLES
     let currentUser = '';
