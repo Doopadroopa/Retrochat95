@@ -1,6 +1,6 @@
 // ============================================================================
-// RETROCHAT95 v1.0 - OFFICIAL PUBLIC RELEASE
-// Server Backend with Full Database Persistence
+// RETROCHAT95 BETA
+// Server WITH SOME BUGS.
 // ============================================================================
 
 const express = require('express');
