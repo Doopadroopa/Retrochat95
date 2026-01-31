@@ -1142,7 +1142,7 @@
 
     // ==================== SOCKET.IO CONNECTION ====================
     // IMPORTANT: UPDATE THIS URL WITH YOUR RAILWAY DEPLOYMENT URL!
-    const socket = io("http://localhost:3000", {
+    const socket = io("retrochat95-production.up.railway.app", {
         transports: ["websocket", "polling"],
         reconnection: true,
         reconnectionDelay: 1000,
