@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetroChat95 (BETA)</title>
+    <title>RetroChat95 BETA</title>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js" crossorigin="anonymous"></script>
     <style>
         /* ====== RESET ====== */
@@ -15,7 +15,7 @@
 
         /* ====== BODY & DESKTOP ====== */
         body {
-            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+            font-family: 'Comic Sans MS', 'Comic Sans';
             background: #008080;
             overflow: hidden;
             height: 100vh;
@@ -763,13 +763,13 @@
         <!-- Desktop Icon -->
         <div class="desktop-icon" ondblclick="openChatWindow()">
             <div class="desktop-icon-image">&#128172;</div>
-            <div class="desktop-icon-label">RetroChat95<br>(BETA)</div>
+            <div class="desktop-icon-label">RetroChat95<br>BETA</div>
         </div>
 
         <!-- Login Window -->
         <div class="window login-window active" id="loginWindow">
             <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">RetroChat95 (BETA) - Login</div>
+                <div class="title-bar-text">RetroChat95 BETA - Login</div>
             </div>
             <div class="window-body">
                 <div class="login-form">
@@ -855,7 +855,7 @@
                     <div class="messages-area" id="messagesArea">
                         <div class="message message-system">
                             <div class="message-content">
-                                Welcome to RetroChat95 BETA Type /help to see all commands.
+                                Welcome to RetroChat95 BETA! Type /help to see all commands.
                             </div>
                         </div>
                     </div>
@@ -890,7 +890,7 @@
             <div class="window-body">
                 <div class="about-content">
                     <h1>RetroChat95</h1>
-                    <p><strong>Version:</strong>BETA RELEASE</p>
+                    <p><strong>Version:</strong> BETA </p>
                     <p><strong>Released:</strong> January 2026</p>
                     <p style="margin-top: 15px;">The kewlest chat experience on the web!</p>
                     
@@ -906,7 +906,7 @@
                         [x] Message reactions<br>
                         [x] CRT mode effect<br>
                         [x] Draggable windows<br>
-                        [x] Windows 95 theme
+                        [x] Pure 90s nostalgia
                     </p>
                     
                     <button onclick="closeWindow('aboutWindow')" style="margin-top: 25px;">OK</button>
@@ -1128,6 +1128,14 @@
     let pmTarget = null;
     let isGuest = false;
 
+    // ROOM MESSAGE STORAGE - FIX FOR MESSAGE PERSISTENCE
+    let roomMessages = {
+        'general': '',
+        'random': '',
+        'images': '',
+        'windows': ''
+    };
+
     // ALL POSSIBLE ACHIEVEMENTS
     const allAchievements = [
         { id: 'first-message', title: 'First Message!', desc: 'Sent your first message' },
@@ -1141,8 +1149,7 @@
     ];
 
     // ==================== SOCKET.IO CONNECTION ====================
-    // IMPORTANT: UPDATE THIS URL WITH YOUR RAILWAY DEPLOYMENT URL!
-    const socket = io("retrochat95-production.up.railway.app", {
+        const socket = io("retrochat95-production.up.railway.app", {
         transports: ["websocket", "polling"],
         reconnection: true,
         reconnectionDelay: 1000,
@@ -1257,6 +1264,10 @@
     // SWITCH ROOM
     function switchRoom(room) {
         if (room === currentRoom) return;
+
+    // SAVE current room messages before switching
+    const messagesArea = document.getElementById('messagesArea');
+    roomMessages[currentRoom] = messagesArea.innerHTML;
         
         socket.emit('chat-message', {
             message: `/join ${room}`,
@@ -1520,7 +1531,7 @@
         });
 
         // ADD MESSAGE FUNCTION
-        function addMessage(username, text, color, timestamp, status = 'Online') {
+        function addMessage(username, text, color, timestamp, status = 'Online', isHistory = false) {
             const messagesArea = document.getElementById('messagesArea');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
@@ -1553,7 +1564,7 @@
             messageCount++;
             document.getElementById('messageCount').textContent = `Messages: ${messageCount}`;
 
-            if (username !== currentUser) {
+            if (!isHistory && username !== currentUser) {
                 showNotification(`${username}: ${text.substring(0, 40)}...`);
             }
         }
@@ -1885,7 +1896,7 @@
             
             messages.forEach(msg => {
                 if (msg.message_type === 'normal') {
-                    addMessage(msg.username, msg.message, msg.color, msg.timestamp);
+                    addMessage(msg.username, msg.message, msg.color, msg.timestamp, 'Online', true);
                 } else if (msg.message_type === 'action') {
                     addActionMessage(msg.username, msg.message, msg.color, msg.timestamp);
                 } else if (msg.message_type === 'image') {
@@ -1894,6 +1905,10 @@
             });
             
             addSystemMessage('--- End of message history ---');
+
+        // Save this room's messages
+        const messagesArea = document.getElementById('messagesArea');
+        roomMessages[currentRoom] = messagesArea.innerHTML;
         });
 
         socket.on('reaction-added', data => {
