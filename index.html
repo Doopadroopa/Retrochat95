@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetroChat95 BETA</title>
+    <title>RetroChat95 BETA - Official Release</title>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js" crossorigin="anonymous"></script>
     <style>
         /* ====== RESET ====== */
@@ -890,9 +890,9 @@
             <div class="window-body">
                 <div class="about-content">
                     <h1>RetroChat95</h1>
-                    <p><strong>Version:</strong> BETA </p>
-                    <p><strong>Released:</strong> January 2026</p>
-                    <p style="margin-top: 15px;">The kewlest chat experience on the web retroslop booo boooooooo!</p>
+                    <p><strong>Version:</strong> retroslop beta </p>
+                    <p><strong>Released:</strong> February 2026</p>
+                    <p style="margin-top: 15px;">The (not) kewlest chat experience on the web!</p>
                     
                     <p style="margin-top: 25px; text-align: left; margin-left: 60px; line-height: 2;">
                         <strong>Features:</strong><br>
@@ -1127,12 +1127,12 @@
     let pmTarget = null;
     let isGuest = false;
 
-    // ROOM MESSAGE STORAGE - FIX FOR MESSAGE PERSISTENCE
+    // ROOM MESSAGE STORAGE
     let roomMessages = {
-        'general': '',
-        'random': '',
-        'images': '',
-        'windows': ''
+        general: '',
+        random: '',
+        images: '',
+        windows: ''
     };
 
     // ALL POSSIBLE ACHIEVEMENTS
@@ -1148,7 +1148,8 @@
     ];
 
     // ==================== SOCKET.IO CONNECTION ====================
-        const socket = io("retrochat95-production.up.railway.app", {
+    // IMPORTANT: UPDATE THIS URL WITH YOUR RAILWAY OR SERVER THINGIE DEPLOYMENT URL!
+    const socket = io("retrochat95-production.up.railway.app", {
         transports: ["websocket", "polling"],
         reconnection: true,
         reconnectionDelay: 1000,
@@ -1264,9 +1265,12 @@
     function switchRoom(room) {
         if (room === currentRoom) return;
 
-    // SAVE current room messages before switching
-    const messagesArea = document.getElementById('messagesArea');
-    roomMessages[currentRoom] = messagesArea.innerHTML;
+            // Save current room messages
+            const messagesArea = document.getElementById('messagesArea');
+            if (messagesArea) {
+                roomMessages[currentRoom] = messagesArea.innerHTML;
+                console.log('Saved messages for room:', currentRoom);
+            }
         
         socket.emit('chat-message', {
             message: `/join ${room}`,
@@ -1853,13 +1857,27 @@
             messageCount = 0;
         });
 
-        socket.on('room-changed', room => {
-            currentRoom = room;
-            document.getElementById('currentRoom').textContent = room;
-            document.getElementById('messagesArea').innerHTML = '';
+    socket.on('room-changed', room => {
+        console.log('Room changed to:', room);
+        currentRoom = room;
+        document.getElementById('currentRoom').textContent = room;
+        document.getElementById('roomInfo').textContent = `Room: #${room}`;
+        
+        const messagesArea = document.getElementById('messagesArea');
+        
+        // Restore saved messages for this room
+        if (roomMessages[room] && roomMessages[room].length > 0) {
+            console.log('Restoring saved messages for:', room);
+            messagesArea.innerHTML = roomMessages[room];
+        } else {
+            console.log('No saved messages for:', room, '- clearing');
+            messagesArea.innerHTML = '';
             addSystemMessage(`Joined room: #${room}`);
-            messageCount = 0;
-        });
+        }
+        
+        messageCount = 0;
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    });
 
         socket.on('private-message', data => {
             showPMWindow(data.from);
@@ -1905,9 +1923,12 @@
             
             addSystemMessage('--- End of message history ---');
 
-        // Save this room's messages
+        // Save this room's messages after loading history
         const messagesArea = document.getElementById('messagesArea');
-        roomMessages[currentRoom] = messagesArea.innerHTML;
+        if (messagesArea) {
+            roomMessages[currentRoom] = messagesArea.innerHTML;
+            console.log('Saved history for room:', currentRoom);
+        }
         });
 
         socket.on('reaction-added', data => {
