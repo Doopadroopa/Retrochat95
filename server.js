@@ -1,5 +1,6 @@
 // ============================================================================
-// RETROCHAT95 BETA  PUBLIC RELEASE retroslopp boiiiii
+// RETROCHAT95 BETA - OFFICIAL PUBLIC RELEASE
+// Server Backend with Full Database Persistence
 // ============================================================================
 
 const express = require('express');
@@ -704,6 +705,51 @@ io.on('connection', (socket) => {
                     socket.emit('room-changed', newRoom);
                     break;
 
+                case '/msg':
+                    const targetUser = sanitizeInput(parts[1] || '');
+                    const pmMessage = parts.slice(2).join(' ');
+
+                    if (!targetUser || !pmMessage) {
+                        socket.emit('command-error', 'Usage: /msg <username> <message>');
+                        return;
+                    }
+
+                    const targetSocket = Object.keys(connectedUsers).find(
+                        id => connectedUsers[id].username === targetUser
+                    );
+
+                    if (targetSocket) {
+                        io.to(targetSocket).emit('private-message', {
+                            from: user.username,
+                            message: pmMessage,
+                            color: user.color,
+                            timestamp: getCurrentTime()
+                        });
+
+                        socket.emit('private-message-sent', {
+                            to: targetUser,
+                            message: pmMessage,
+                            timestamp: getCurrentTime()
+                        });
+
+                        // Achievement: Socialite
+                        if (!user.isGuest) {
+                            const achievements = await getUserAchievements(user.username);
+                            if (!achievements.includes('socialite')) {
+                                const unlocked = await unlockAchievement(user.username, 'socialite');
+                                if (unlocked) {
+                                    socket.emit('achievement-unlocked', {
+                                        title: 'Socialite',
+                                        description: 'Sent your first private message'
+                                    });
+                                }
+                            }
+                        }
+                    } else {
+                        socket.emit('command-error', `User '${targetUser}' not found.`);
+                    }
+                    break;
+
                 case '/help':
                     socket.emit('help-message', {
                         commands: [
@@ -959,7 +1005,7 @@ async function startServer() {
         server.listen(PORT, () => {
             console.log('');
             console.log('============================================');
-            console.log('  RETROCHAT95 BETA - retroslop RELEASE');
+            console.log('  RETROCHAT95 BETA - retroslop gubbies boiii RELEASE');
             console.log('============================================');
             console.log(`  Port:     ${PORT}`);
             console.log(`  Database: ${DB_PATH}`);
