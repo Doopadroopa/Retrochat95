@@ -1,25 +1,8 @@
 <!DOCTYPE html>
-<!--
-RetroChat95 BETA
-Copyright (C) 2026 Tricarty
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
--->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=BETA">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RetroChat95 BETA</title>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js" crossorigin="anonymous"></script>
     <style>
@@ -907,9 +890,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
             <div class="window-body">
                 <div class="about-content">
                     <h1>RetroChat95</h1>
-                    <p><strong>Version:</strong> BETA - BETA RELEASE</p>
+                    <p><strong>Version:</strong> BETA </p>
                     <p><strong>Released:</strong> January 2026</p>
-                    <p style="margin-top: 15px;">The kewlest chat experience on the web!</p>
+                    <p style="margin-top: 15px;">The kewlest chat experience on the web retroslop booo boooooooo!</p>
                     
                     <p style="margin-top: 25px; text-align: left; margin-left: 60px; line-height: 2;">
                         <strong>Features:</strong><br>
@@ -923,7 +906,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
                         [x] Message reactions<br>
                         [x] CRT mode effect<br>
                         [x] Draggable windows<br>
-                        [x] Pure 90s nostalgia
                     </p>
                     
                     <button onclick="closeWindow('aboutWindow')" style="margin-top: 25px;">OK</button>
@@ -1145,12 +1127,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     let pmTarget = null;
     let isGuest = false;
 
-    // ROOM MESSAGE STORAGE - Each room has its own messages
+    // ROOM MESSAGE STORAGE - FIX FOR MESSAGE PERSISTENCE
     let roomMessages = {
-        general: '',
-        random: '',
-        images: '',
-        windows: ''
+        'general': '',
+        'random': '',
+        'images': '',
+        'windows': ''
     };
 
     // ALL POSSIBLE ACHIEVEMENTS
@@ -1166,8 +1148,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
     ];
 
     // ==================== SOCKET.IO CONNECTION ====================
-    // IMPORTANT: UPDATE THIS URL WITH YOUR RAILWAY OR WHATEVER DEPLOYMENT URL!
-    const socket = io("retrochat95-production.up.railway.app", {
+        const socket = io("retrochat95-production.up.railway.app", {
         transports: ["websocket", "polling"],
         reconnection: true,
         reconnectionDelay: 1000,
@@ -1281,32 +1262,29 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
     // SWITCH ROOM
     function switchRoom(room) {
-            if (room === currentRoom) return;
-            
-            console.log('=== SWITCHING ROOMS ===');
-            console.log('From:', currentRoom, 'To:', room);
-            
-            // SAVE current room's messages BEFORE switching
-            const messagesArea = document.getElementById('messagesArea');
-            if (messagesArea && currentRoom) {
-                roomMessages[currentRoom] = messagesArea.innerHTML;
-                console.log('SAVED messages for:', currentRoom, '- Length:', roomMessages[currentRoom].length);
+        if (room === currentRoom) return;
+
+    // SAVE current room messages before switching
+    const messagesArea = document.getElementById('messagesArea');
+    roomMessages[currentRoom] = messagesArea.innerHTML;
+        
+        socket.emit('chat-message', {
+            message: `/join ${room}`,
+            timestamp: getCurrentTime()
+        });
+        
+        // Update UI
+        document.querySelectorAll('.room-tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.getAttribute('data-room') === room) {
+                tab.classList.add('active');
             }
-            
-            // Update UI
-            document.querySelectorAll('.room-tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.textContent === '#' + room) {
-                    tab.classList.add('active');
-                }
-            });
-            
-            // Tell server to switch rooms
-            socket.emit('chat-message', {
-                message: `/join ${room}`,
-                timestamp: getCurrentTime()
-            });
-        }
+        });
+        
+        currentRoom = room;
+        document.getElementById('currentRoom').textContent = room;
+        document.getElementById('roomInfo').textContent = `Room: #${room}`;
+    }
 
     // SHOW WINDOWS
     function showAbout() { 
@@ -1876,23 +1854,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         });
 
         socket.on('room-changed', room => {
-        console.log('=== ROOM CHANGED ===');
-        console.log('New room:', room);
-        
-        currentRoom = room;
-        document.getElementById('currentRoom').textContent = room;
-        document.getElementById('roomInfo').textContent = `Room: #${room}`;
-        
-        const messagesArea = document.getElementById('messagesArea');
-        
-        // CLEAR the messages area first
-        messagesArea.innerHTML = '';
-        
-        // DON'T restore saved messages here - let message-history do it
-        console.log('Cleared messages area, waiting for history...');
-        
-        messageCount = 0;
-    });;
+            currentRoom = room;
+            document.getElementById('currentRoom').textContent = room;
+            document.getElementById('messagesArea').innerHTML = '';
+            addSystemMessage(`Joined room: #${room}`);
+            messageCount = 0;
+        });
 
         socket.on('private-message', data => {
             showPMWindow(data.from);
@@ -1924,57 +1891,24 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
         });
 
         socket.on('message-history', messages => {
-        console.log('=== MESSAGE HISTORY ===');
-        console.log('Room:', currentRoom, '- Messages:', messages ? messages.length : 0);
-        
-        if (!messages || messages.length === 0) {
-            console.log('No history for this room');
-            // Check if we have saved messages
-            if (roomMessages[currentRoom] && roomMessages[currentRoom].length > 0) {
-                console.log('RESTORING saved messages for:', currentRoom);
-                const messagesArea = document.getElementById('messagesArea');
-                messagesArea.innerHTML = roomMessages[currentRoom];
-                messagesArea.scrollTop = messagesArea.scrollHeight;
-            } else {
-                console.log('No saved messages either - showing join message');
-                addSystemMessage(`Joined room: #${currentRoom}`);
-            }
-            return;
-        }
-        
-        const messagesArea = document.getElementById('messagesArea');
-        
-        // Check if we already have saved messages for this room
-        if (roomMessages[currentRoom] && roomMessages[currentRoom].length > 0) {
-            console.log('RESTORING saved messages (already loaded before)');
-            messagesArea.innerHTML = roomMessages[currentRoom];
-        } else {
-            console.log('LOADING fresh history from database');
-            // Clear first
-            messagesArea.innerHTML = '';
+            if (!messages || messages.length === 0) return;
             
-            // Load history messages
             messages.forEach(msg => {
                 if (msg.message_type === 'normal') {
                     addMessage(msg.username, msg.message, msg.color, msg.timestamp, 'Online', true);
                 } else if (msg.message_type === 'action') {
                     addActionMessage(msg.username, msg.message, msg.color, msg.timestamp);
                 } else if (msg.message_type === 'image') {
-                    addSystemMessage(`${msg.username} posted an image`);
-                } else if (msg.message_type === 'image-upload') {
-                    addSystemMessage(`${msg.username} posted an image`);
+                    addSystemMessage(`${msg.username} posted an image: ${msg.message}`);
                 }
             });
             
             addSystemMessage('--- End of message history ---');
-            
-            // SAVE the loaded history
-            roomMessages[currentRoom] = messagesArea.innerHTML;
-            console.log('SAVED history for:', currentRoom, '- Length:', roomMessages[currentRoom].length);
-        }
-        
-        messagesArea.scrollTop = messagesArea.scrollHeight;
-    });;
+
+        // Save this room's messages
+        const messagesArea = document.getElementById('messagesArea');
+        roomMessages[currentRoom] = messagesArea.innerHTML;
+        });
 
         socket.on('reaction-added', data => {
             // Handle reaction updates if needed
