@@ -167,7 +167,7 @@ let rooms = {
 
 const BANNED_WORDS = [
     // Racial slurs
-    'nigger', 'nigga', 'n1gger', 'n1gga', 'nig', 'nigg', 'n!gger', 'n!gga' 'nga',
+    'nigger', 'nigga', 'n1gger', 'n1gga', 'nig', 'nigg', 'n!gger', 'n!gga', 'nga',
     // Homophobic slurs
     'faggot', 'fag', 'f4ggot', 'f4g', 'f@ggot', 'f@g', 'fa66ot',
     // Ableist slurs
