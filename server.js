@@ -1,6 +1,5 @@
 // ============================================================================
-// RETROCHAT95 BETA - OFFICIAL PUBLIC RELEASE
-// Server Backend with Full Database Persistence
+// RETROCHAT95 BETA - OFFICIAL PUBLIC RELEASE retroslop gubbies boiiiiiiii so retro
 // ============================================================================
 
 const express = require('express');
