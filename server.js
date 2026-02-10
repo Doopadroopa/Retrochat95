@@ -1,23 +1,5 @@
-/*
- * RetroChat95 BETA
- * Copyright (C) 2026 Tricarty
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-
 // ============================================================================
-// RETROCHAT95 BETA lets not steal it ok?????? its open source so you can make your own versions but its under the GPL VERSION 3 LICENSE
+// RETROCHAT95 BETA  PUBLIC RELEASE retroslopp boiiiii
 // ============================================================================
 
 const express = require('express');
@@ -167,7 +149,7 @@ let rooms = {
 
 const BANNED_WORDS = [
     // Racial slurs
-    'nigger', 'nigga', 'n1gger', 'n1gga', 'nig', 'nigg', 'n!gger', 'n!gga', 'nga',
+    'nigger', 'nigga', 'n1gger', 'n1gga', 'nig', 'nigg', 'n!gger', 'n!gga',
     // Homophobic slurs
     'faggot', 'fag', 'f4ggot', 'f4g', 'f@ggot', 'f@g', 'fa66ot',
     // Ableist slurs
@@ -722,51 +704,6 @@ io.on('connection', (socket) => {
                     socket.emit('room-changed', newRoom);
                     break;
 
-                case '/msg':
-                    const targetUser = sanitizeInput(parts[1] || '');
-                    const pmMessage = parts.slice(2).join(' ');
-
-                    if (!targetUser || !pmMessage) {
-                        socket.emit('command-error', 'Usage: /msg <username> <message>');
-                        return;
-                    }
-
-                    const targetSocket = Object.keys(connectedUsers).find(
-                        id => connectedUsers[id].username === targetUser
-                    );
-
-                    if (targetSocket) {
-                        io.to(targetSocket).emit('private-message', {
-                            from: user.username,
-                            message: pmMessage,
-                            color: user.color,
-                            timestamp: getCurrentTime()
-                        });
-
-                        socket.emit('private-message-sent', {
-                            to: targetUser,
-                            message: pmMessage,
-                            timestamp: getCurrentTime()
-                        });
-
-                        // Achievement: Socialite
-                        if (!user.isGuest) {
-                            const achievements = await getUserAchievements(user.username);
-                            if (!achievements.includes('socialite')) {
-                                const unlocked = await unlockAchievement(user.username, 'socialite');
-                                if (unlocked) {
-                                    socket.emit('achievement-unlocked', {
-                                        title: 'Socialite',
-                                        description: 'Sent your first private message'
-                                    });
-                                }
-                            }
-                        }
-                    } else {
-                        socket.emit('command-error', `User '${targetUser}' not found.`);
-                    }
-                    break;
-
                 case '/help':
                     socket.emit('help-message', {
                         commands: [
@@ -1022,7 +959,7 @@ async function startServer() {
         server.listen(PORT, () => {
             console.log('');
             console.log('============================================');
-            console.log('  RETROCHAT95 BETA - BETA RELEASE');
+            console.log('  RETROCHAT95 BETA - retroslop RELEASE');
             console.log('============================================');
             console.log(`  Port:     ${PORT}`);
             console.log(`  Database: ${DB_PATH}`);
