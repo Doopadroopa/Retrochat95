@@ -1,6 +1,6 @@
 /*
  * RetroChat95 BETA
- * Copyright (C) 2025 Tricarty
+ * Copyright (C) 2026 Tricarty
  * Licensed under GPL-3.0
  */
 
