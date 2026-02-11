@@ -1,5 +1,23 @@
+/*
+ * RetroChat95 BETA
+ * Copyright (C) 2026 Tricarty
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 // ============================================================================
-// RETROCHAT95 BETA - OFFICIAL PUBLIC RELEASE retroslop gubbies boiiiiiiii so retro
+// RETROCHAT95 BETA - OFFICIAL PUBLIC RELEASE retr0sl0pzzzzz b01 s0 gubb3h
 // ============================================================================
 
 const express = require('express');
@@ -144,7 +162,7 @@ let rooms = {
 };
 
 // ============================================================================
-// CONTENT FILTERS
+// CONTENT FILTERS dont cancel me
 // ============================================================================
 
 const BANNED_WORDS = [
@@ -183,7 +201,7 @@ const WIN95_ERRORS = [
     "This program has caused a General Protection Fault in KRNL386.EXE"
 ];
 
-// Tips and jokes
+// Tips and jokes boi so gubbeh
 const TIPS_AND_JOKES = [
     "[TIP] Use /help to see all available commands!",
     "[TIP] You can change your color with /color #RRGGBB",
@@ -1004,7 +1022,7 @@ async function startServer() {
         server.listen(PORT, () => {
             console.log('');
             console.log('============================================');
-            console.log('  RETROCHAT95 BETA - retroslop gubbies boiii RELEASE');
+            console.log('  RETROCHAT95 BETA retroslop');
             console.log('============================================');
             console.log(`  Port:     ${PORT}`);
             console.log(`  Database: ${DB_PATH}`);
