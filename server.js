@@ -1,23 +1,11 @@
 /*
  * RetroChat95 BETA
- * Copyright (C) 2026 Tricarty
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ * Copyright (C) 2025 Tricarty
+ * Licensed under GPL-3.0
  */
 
 // ============================================================================
-// RETROCHAT95 BETA - OFFICIAL PUBLIC RELEASE retr0sl0pzzzzz b01 s0 gubb3h
+// RETROCHAT95 BETA - OFFICIAL PUBLIC RELEASE retroslop gubbieh boizzzza retro
 // ============================================================================
 
 const express = require('express');
@@ -56,7 +44,7 @@ app.get('/', (req, res) => {
 
 // Health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'OK', version: 'BETA', uptime: process.uptime() });
+    res.json({ status: 'OK', version: '1.0', uptime: process.uptime() });
 });
 
 // ============================================================================
@@ -162,7 +150,7 @@ let rooms = {
 };
 
 // ============================================================================
-// CONTENT FILTERS dont cancel me
+// CONTENT FILTERS
 // ============================================================================
 
 const BANNED_WORDS = [
@@ -201,7 +189,7 @@ const WIN95_ERRORS = [
     "This program has caused a General Protection Fault in KRNL386.EXE"
 ];
 
-// Tips and jokes boi so gubbeh
+// Tips and jokes
 const TIPS_AND_JOKES = [
     "[TIP] Use /help to see all available commands!",
     "[TIP] You can change your color with /color #RRGGBB",
@@ -1022,7 +1010,7 @@ async function startServer() {
         server.listen(PORT, () => {
             console.log('');
             console.log('============================================');
-            console.log('  RETROCHAT95 BETA retroslop');
+            console.log('  RETROCHAT95 BETA - OFFICIAL RELEASE gubies boi forsaken retro');
             console.log('============================================');
             console.log(`  Port:     ${PORT}`);
             console.log(`  Database: ${DB_PATH}`);
