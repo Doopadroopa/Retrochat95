@@ -1,12 +1,11 @@
 {
-  "name": "retrochat95-beta",
+  "name": "retrochat95",
   "version": "0.9.0",
-  "description": "RetroChat95 BETA by Tricarty",
+  "description": "RetroChat95 BETA",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": ["chat", "socket.io", "retro", "windows95", "beta"],
   "author": "Tricarty",
   "license": "GPL-3.0",
   "dependencies": {
