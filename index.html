@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
-RetroChat95 BETA - Copyright (C) 2025 Tricarty
-Licensed under GPL-3.0 - See LICENSE file
+RetroChat95 BETA - By Tricarty
+GPL-3.0 License
 -->
 <html lang="en">
 <head>
@@ -841,9 +841,7 @@ Licensed under GPL-3.0 - See LICENSE file
                 </div>
 
                 <!-- Room Tabs -->
-                <div class="rooms-selector">
-                    <div class="room-tab active" data-room="general" onclick="switchRoom('general')">#general</div>
-                    <div class="room-tab" data-room="random" onclick="switchRoom('random')">#random</div>
+                
                     <div class="room-tab" data-room="images" onclick="switchRoom('images')">#images</div>
                     <div class="room-tab" data-room="windows" onclick="switchRoom('windows')">#windows</div>
                 </div>
@@ -894,8 +892,8 @@ Licensed under GPL-3.0 - See LICENSE file
             <div class="window-body">
                 <div class="about-content">
                     <h1>RetroChat95</h1>
-                    <p><strong>Version:</strong> 1.0 - Official Release</p>
-                    <p><strong>Released:</strong> January 2026</p>
+                    <p><strong>Version:</strong>BETA RELEASE</p>
+                    <p><strong>Released:</strong>February 2026</p>
                     <p style="margin-top: 15px;">The kewlest chat experience on the web!</p>
                     
                     <p style="margin-top: 25px; text-align: left; margin-left: 60px; line-height: 2;">
@@ -910,7 +908,7 @@ Licensed under GPL-3.0 - See LICENSE file
                         [x] Message reactions<br>
                         [x] CRT mode effect<br>
                         [x] Draggable windows<br>
-                        [x] Pure 90s nostalgia
+                        [x] Pure 90s nostalgia (boi ts so retro)
                     </p>
                     
                     <button onclick="closeWindow('aboutWindow')" style="margin-top: 25px;">OK</button>
@@ -1095,6 +1093,10 @@ Licensed under GPL-3.0 - See LICENSE file
             </div>
         </div>
 
+        
+        <!-- DM Windows (dynamically created) -->
+        <div id="dmWindowsContainer"></div>
+
         <!-- Taskbar -->
         <div class="taskbar">
             <button class="start-button" onclick="toggleStartMenu()">Start</button>
@@ -1121,7 +1123,7 @@ Licensed under GPL-3.0 - See LICENSE file
     let currentUser = '';
     let userColor = '#ff00ff';
     let userStatus = 'Online';
-    let currentRoom = 'general';
+    // Removed rooms - single main chat
     let messages = [];
     let users = [];
     let messageCount = 0;
@@ -1131,14 +1133,6 @@ Licensed under GPL-3.0 - See LICENSE file
     let messageDelay = 0;
     let pmTarget = null;
     let isGuest = false;
-
-    // ROOM STORAGE - Each room completely separate
-    let roomData = {
-        general: { html: '', loaded: false },
-        random: { html: '', loaded: false },
-        images: { html: '', loaded: false },
-        windows: { html: '', loaded: false }
-    };
 
     // ALL POSSIBLE ACHIEVEMENTS
     const allAchievements = [
@@ -1154,7 +1148,7 @@ Licensed under GPL-3.0 - See LICENSE file
 
     // ==================== SOCKET.IO CONNECTION ====================
     // IMPORTANT: UPDATE THIS URL WITH YOUR RAILWAY OR WHATEVER DEPLOYMENT URL!
-    const socket = io("retrochat95.up.railway.app", {
+    const socket = io("retrochat95.up.railway.app" // UPDATE THIS WITH YOUR you know what i mean URL!, {
         transports: ["websocket", "polling"],
         reconnection: true,
         reconnectionDelay: 1000,
@@ -1267,38 +1261,8 @@ Licensed under GPL-3.0 - See LICENSE file
     }
 
     // SWITCH ROOM
-    function switchRoom(room) {
-            if (room === currentRoom) {
-                console.log('[SWITCH] Already in room:', room);
-                return;
-            }
-            
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            console.log('[SWITCH] From:', currentRoom, '→ To:', room);
-            
-            // SAVE current room's messages before leaving
-            const messagesArea = document.getElementById('messagesArea');
-            if (messagesArea && currentRoom) {
-                roomMessages[currentRoom] = messagesArea.innerHTML;
-                console.log('[SWITCH] ✓ SAVED', currentRoom, '- Length:', roomMessages[currentRoom].length);
-            }
-            
-            // Update UI tabs
-            document.querySelectorAll('.room-tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.textContent === '#' + room) {
-                    tab.classList.add('active');
-                }
-            });
-            
-            // Tell server to switch rooms
-            console.log('[SWITCH] Sending /join command to server...');
-            socket.emit('chat-message', {
-                message: `/join ${room}`,
-                timestamp: getCurrentTime()
-            });
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        }
+    // switchRoom removed error shit
+
 
     // SHOW WINDOWS
     function showAbout() { 
@@ -1544,7 +1508,7 @@ Licensed under GPL-3.0 - See LICENSE file
         });
 
         // ADD MESSAGE FUNCTION
-        function addMessage(username, text, color, timestamp, status = 'Online', isHistory = false) {
+        function addMessage(username, text, color, timestamp, status = 'Online') {
             const messagesArea = document.getElementById('messagesArea');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message';
@@ -1577,7 +1541,7 @@ Licensed under GPL-3.0 - See LICENSE file
             messageCount++;
             document.getElementById('messageCount').textContent = `Messages: ${messageCount}`;
 
-            if (!isHistory && username !== currentUser) {
+            if (username !== currentUser) {
                 showNotification(`${username}: ${text.substring(0, 40)}...`);
             }
         }
@@ -1721,7 +1685,7 @@ Licensed under GPL-3.0 - See LICENSE file
         function updateUsersList() {
             const usersList = document.getElementById('usersList');
             usersList.innerHTML = users.map(u => `
-                <div class="user-item">
+                <div class="user-item" style="cursor: pointer;" onclick="openDMFromList(this)">
                     <div class="user-status online"></div>
                     ${escapeHtml(u)}
                 </div>
@@ -1776,7 +1740,104 @@ Licensed under GPL-3.0 - See LICENSE file
 
         updateUsersList();
 
-        // ==================== SOCKET.IO EVENTS ====================
+        
+    // ==================== DIRECT MESSAGES ====================
+    
+    let dmWindows = {}; // Track open DM windows
+    
+    
+    function openDMFromList(element) {
+        const username = element.textContent.trim();
+        openDM(username);
+    }
+    
+function openDM(targetUser) {
+        if (targetUser === currentUser) {
+            alert("You can't DM yourself!");
+            return;
+        }
+        
+        // Check if window already exists
+        if (dmWindows[targetUser]) {
+            document.getElementById(`dm-${targetUser}`).classList.add('active');
+            return;
+        }
+        
+        // Create DM window
+        const dmWin = document.createElement('div');
+        dmWin.className = 'window active';
+        dmWin.id = `dm-${targetUser}`;
+        dmWin.style.width = '600px';
+        dmWin.style.height = '450px';
+        dmWin.style.top = (100 + Object.keys(dmWindows).length * 30) + 'px';
+        dmWin.style.left = (150 + Object.keys(dmWindows).length * 30) + 'px';
+        dmWin.style.position = 'absolute';
+        
+        dmWin.innerHTML = `
+            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
+                <div class="title-bar-text">💬 DM with ${targetUser}</div>
+                <div class="title-bar-controls">
+                    <button onclick="closeDM('${targetUser}')">X</button>
+                </div>
+            </div>
+            <div class="window-body">
+                <div class="messages-area" id="dm-messages-${targetUser}" style="height: 330px; border: 2px inset #808080; background: white; padding: 10px; overflow-y: auto; margin-bottom: 10px;"></div>
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" id="dm-input-${targetUser}" placeholder="Type message..." style="flex: 1; padding: 5px; border: 2px inset #808080;" onkeypress="if(event.key==='Enter')sendDM('${targetUser}')">
+                    <button onclick="sendDM('${targetUser}')">SEND</button>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('dmWindowsContainer').appendChild(dmWin);
+        dmWindows[targetUser] = true;
+        
+        // Load DM history from server
+        socket.emit('start-dm', targetUser);
+        
+        console.log('[DM] Opened DM with', targetUser);
+    }
+    
+    function closeDM(targetUser) {
+        const win = document.getElementById(`dm-${targetUser}`);
+        if (win) win.remove();
+        delete dmWindows[targetUser];
+        console.log('[DM] Closed DM with', targetUser);
+    }
+    
+    function sendDM(targetUser) {
+        const input = document.getElementById(`dm-input-${targetUser}`);
+        const message = input.value.trim();
+        if (!message) return;
+        
+        socket.emit('send-dm', {
+            receiver: targetUser,
+            message: message
+        });
+        
+        input.value = '';
+    }
+    
+    function addDMMessage(targetUser, sender, message, color, timestamp) {
+        const area = document.getElementById(`dm-messages-${targetUser}`);
+        if (!area) return;
+        
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message';
+        messageDiv.innerHTML = `
+            <div class="message-header">
+                <span style="color: ${color};">${escapeHtml(sender)}</span>
+                <span class="timestamp">[${timestamp}]</span>
+            </div>
+            <div class="message-content">${escapeHtml(message)}</div>
+        `;
+        
+        area.appendChild(messageDiv);
+        area.scrollTop = area.scrollHeight;
+    }
+    
+
+    // ==================== SOCKET.IO EVENTS ====================
 
         socket.on('connect', () => {
             console.log('[Connected] Socket.IO connected');
@@ -1784,7 +1845,34 @@ Licensed under GPL-3.0 - See LICENSE file
             document.getElementById('statusText').style.color = '#00ff00';
         });
 
-        socket.on('disconnect', () => {
+        
+    // DM handlers
+    socket.on('dm-history', data => {
+        console.log('[DM] Loaded history with', data.targetUser, '-', data.messages.length, 'messages');
+        const area = document.getElementById(`dm-messages-${data.targetUser}`);
+        if (!area) return;
+        
+        area.innerHTML = '';
+        data.messages.forEach(msg => {
+            addDMMessage(data.targetUser, msg.sender, msg.message, '#ff00ff', msg.timestamp);
+        });
+    });
+    
+    socket.on('dm-message', data => {
+        const targetUser = data.sender === currentUser ? data.receiver : data.sender;
+        
+        console.log('[DM] Received DM from/to', targetUser);
+        
+        // Auto-open DM window if not already open
+        if (!dmWindows[targetUser]) {
+            openDM(targetUser);
+        }
+        
+        addDMMessage(targetUser, data.sender, data.message, '#ff00ff', data.timestamp);
+    });
+    
+
+    socket.on('disconnect', () => {
             console.log('[Disconnected] Socket.IO disconnected');
             document.getElementById('statusText').textContent = 'Disconnected';
             document.getElementById('statusText').style.color = '#ff0000';
@@ -1802,15 +1890,7 @@ Licensed under GPL-3.0 - See LICENSE file
         
         socket.on('image-message', data => {
             addImageMessage(data.username, data.imageData, data.color, data.timestamp);
-            // Save after image
-        setTimeout(() => {
-            const messagesArea = document.getElementById('messagesArea');
-            if (messagesArea && currentRoom) {
-                roomMessages[currentRoom] = messagesArea.innerHTML;
-                console.log('[AUTO-SAVE] Saved', currentRoom, 'after image');
-            }
-        }, 100);
-    });
+        });
 
         socket.on('image-keyword', data => {
             addImageMessage(data.username, data.imageUrl, data.color, data.timestamp);
@@ -1875,20 +1955,8 @@ Licensed under GPL-3.0 - See LICENSE file
             messageCount = 0;
         });
 
-        socket.on('room-changed', room => {
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[ROOM-CHANGED] Switching to:', room);
-        
-        currentRoom = room;
-        document.getElementById('currentRoom').textContent = room;
-        document.getElementById('roomInfo').textContent = `Room: #${room}`;
-        messageCount = 0;
-        
-        // IMPORTANT: Don't touch messages here!
-        // Let message-history handler do ALL the work
-        console.log('[ROOM-CHANGED] Waiting for message-history event...');
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    });;;;
+        // room-changed removed
+;
 
         socket.on('private-message', data => {
             showPMWindow(data.from);
@@ -1920,63 +1988,20 @@ Licensed under GPL-3.0 - See LICENSE file
         });
 
         socket.on('message-history', messages => {
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('[MESSAGE-HISTORY] Current Room:', currentRoom);
-        console.log('[MESSAGE-HISTORY] Messages from DB:', messages ? messages.length : 0);
-        
-        const messagesArea = document.getElementById('messagesArea');
-        
-        // Check if this room ALREADY has saved messages
-        if (roomMessages[currentRoom] && roomMessages[currentRoom].length > 0) {
-            console.log('[✓ RESTORE] Room already loaded, using saved HTML');
-            console.log('[✓ RESTORE] Saved HTML length:', roomMessages[currentRoom].length);
-            messagesArea.innerHTML = roomMessages[currentRoom];
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-            return;
-        }
-        
-        // Room has NO saved messages - load fresh from database
-        console.log('[LOAD] First time in this room, loading from DB');
-        
-        // CLEAR the messages area first
-        messagesArea.innerHTML = '';
-        console.log(' [LOAD] Cleared messages area');
-        
-        if (!messages || messages.length === 0) {
-            console.log('[LOAD] No messages in database for this room');
-            addSystemMessage(`Joined room: #${currentRoom}`);
-        } else {
-            console.log('[LOAD] Loading', messages.length, 'messages from database');
+            if (!messages || messages.length === 0) return;
             
-            // Load each message with isHistory = true (no notifications)
-            let loaded = 0;
             messages.forEach(msg => {
                 if (msg.message_type === 'normal') {
-                    addMessage(msg.username, msg.message, msg.color, msg.timestamp, 'Online', true);
-                    loaded++;
+                    addMessage(msg.username, msg.message, msg.color, msg.timestamp);
                 } else if (msg.message_type === 'action') {
                     addActionMessage(msg.username, msg.message, msg.color, msg.timestamp);
-                    loaded++;
-                } else if (msg.message_type === 'image' || msg.message_type === 'image-upload') {
-                    addSystemMessage(`${msg.username} posted an image`);
-                    loaded++;
+                } else if (msg.message_type === 'image') {
+                    addSystemMessage(`${msg.username} posted an image: ${msg.message}`);
                 }
             });
             
-            console.log('[⚡ LOAD] Loaded', loaded, 'messages');
             addSystemMessage('--- End of message history ---');
-        }
-        
-        // SAVE this room's messages after loading
-        roomMessages[currentRoom] = messagesArea.innerHTML;
-        roomHistoryLoaded[currentRoom] = true;
-        console.log('[✓ SAVED] Saved messages for room:', currentRoom);
-        console.log('[✓ SAVED] HTML length:', roomMessages[currentRoom].length);
-        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        
-        messagesArea.scrollTop = messagesArea.scrollHeight;
-    });;;;
+        });
 
         socket.on('reaction-added', data => {
             // Handle reaction updates if needed
