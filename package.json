@@ -1,13 +1,11 @@
 {
-  "name": "retrochat95",
+  "name": "retrochat95-beta",
   "version": "0.9.0",
   "description": "RetroChat95 BETA",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "author": "Tricarty",
-  "license": "GPL-3.0",
   "dependencies": {
     "express": "^4.18.2",
     "socket.io": "^4.6.1",
