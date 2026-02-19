@@ -3,1940 +3,1262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetroChat95 BETA</title>
+    <title>Arabiac</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js" crossorigin="anonymous"></script>
     <style>
-        /* ====== RESET ====== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* ===== THEME VARIABLES ===== */
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+            --bg-tertiary: #252525;
+            --bg-hover: #2a2a2a;
+            --bg-active: #333333;
+            --bg-floating: #1e1e1e;
+            --accent: #c9a227;
+            --accent-hover: #dbb833;
+            --accent-dim: rgba(201,162,39,0.15);
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --text-muted: #606060;
+            --border: #2d2d2d;
+            --online: #43b581;
+            --idle: #faa61a;
+            --dnd: #f04747;
+            --mention-bg: rgba(201,162,39,0.12);
+            --scrollbar-thumb: #404040;
+            --scrollbar-track: transparent;
         }
 
-        /* ====== BODY & DESKTOP ====== */
+        /* ===== RESET ===== */
+        * { margin:0; padding:0; box-sizing:border-box; }
         body {
-            font-family: 'Comic Sans MS', 'Comic Sans';
-            background: #008080;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            height: 100vh;
             overflow: hidden;
-            height: 100vh;
-            position: relative;
         }
 
-        /* CRT MODE EFFECT */
-        body.crt-mode::before {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        /* ===== LOGIN ===== */
+        .login-screen {
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-primary);
             z-index: 9999;
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
-            animation: flicker 0.15s infinite;
+        }
+        .login-screen.hidden { display: none; }
+        .login-bg {
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 30% 50%, rgba(201,162,39,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 80%, rgba(201,162,39,0.05) 0%, transparent 50%);
+        }
+        .login-card {
+            position: relative; background: var(--bg-secondary);
+            border: 1px solid var(--border); border-radius: 12px;
+            padding: 40px; width: 420px; max-width: 90vw;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .login-logo { text-align: center; margin-bottom: 30px; }
+        .login-logo h1 {
+            font-size: 36px; font-weight: 700; color: var(--accent);
+            letter-spacing: 2px;
+        }
+        .login-logo p { color: var(--text-secondary); font-size: 14px; margin-top: 6px; }
+        .form-field { margin-bottom: 18px; }
+        .form-field label {
+            display: block; font-size: 12px; font-weight: 600;
+            color: var(--text-secondary); margin-bottom: 6px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .form-field input {
+            width: 100%; padding: 10px 14px; font-size: 14px;
+            background: var(--bg-tertiary); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text-primary);
+            font-family: inherit; outline: none; transition: border 0.2s;
+        }
+        .form-field input:focus { border-color: var(--accent); }
+        .form-field input[type="color"] {
+            width: 50px; height: 36px; padding: 2px; cursor: pointer;
+            border-radius: 6px;
+        }
+        .login-buttons { display: flex; gap: 10px; margin-top: 24px; }
+        .btn {
+            padding: 10px 20px; font-size: 14px; font-weight: 600;
+            border: none; border-radius: 6px; cursor: pointer;
+            font-family: inherit; transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--accent); color: #000; flex: 1;
+        }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-secondary {
+            background: transparent; color: var(--text-secondary);
+            border: 1px solid var(--border); flex: 1;
+        }
+        .btn-secondary:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .btn-small { padding: 6px 12px; font-size: 12px; }
+        .btn-danger { background: var(--dnd); color: #fff; }
+        .login-footer {
+            text-align: center; margin-top: 20px;
+            font-size: 12px; color: var(--text-muted); line-height: 1.6;
         }
 
-        @keyframes flicker {
-            0% { opacity: 0.97; }
-            50% { opacity: 1; }
-            100% { opacity: 0.97; }
+        /* ===== APP LAYOUT ===== */
+        .app { display: none; height: 100vh; }
+        .app.active { display: flex; }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: 240px; background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; flex-shrink: 0;
         }
-
-        body.crt-mode {
-            filter: blur(0.3px);
+        .sidebar-header {
+            padding: 16px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
         }
-
-        .desktop {
-            height: 100vh;
-            position: relative;
-            padding: 10px;
+        .sidebar-header h2 {
+            font-size: 18px; font-weight: 700; color: var(--accent);
+            letter-spacing: 1px;
         }
-
-        /* ====== DESKTOP ICON ====== */
-        .desktop-icon {
-            width: 80px;
-            text-align: center;
-            cursor: pointer;
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            user-select: none;
+        .sidebar-header .status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--online); flex-shrink: 0;
         }
-
-        .desktop-icon-image {
-            width: 50px;
-            height: 50px;
-            background: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
-            margin: 0 auto 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
+        .channels { flex: 1; overflow-y: auto; padding: 8px 0; }
+        .channel-category {
+            padding: 8px 16px; font-size: 11px; font-weight: 700;
+            color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-
-        .desktop-icon-label {
-            color: white;
-            font-size: 11px;
-            text-shadow: 1px 1px 2px black;
-            word-wrap: break-word;
+        .channel {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 16px; margin: 1px 8px; border-radius: 6px;
+            cursor: pointer; color: var(--text-secondary);
+            font-size: 14px; font-weight: 500; transition: all 0.15s;
         }
-
-        .desktop-icon:active .desktop-icon-image {
-            border-color: #000000 #ffffff #ffffff #000000;
+        .channel:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .channel.active {
+            background: var(--accent-dim); color: var(--accent);
         }
+        .channel .hash { font-size: 18px; font-weight: 400; opacity: 0.6; }
 
-        /* ====== WINDOWS ====== */
-        .window {
-            position: absolute;
-            background: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
-            box-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-            display: none;
+        .user-panel {
+            padding: 10px; border-top: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px;
+            background: var(--bg-tertiary);
         }
-
-        .window.active {
-            display: block;
-            z-index: 100;
+        .user-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px; color: #000; flex-shrink: 0;
         }
-
-        .title-bar {
-            background: linear-gradient(to right, #000080, #1084d0);
-            color: white;
-            padding: 3px 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            cursor: move;
-            user-select: none;
+        .user-panel-info { flex: 1; min-width: 0; }
+        .user-panel-name {
+            font-size: 13px; font-weight: 600; color: var(--text-primary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-
-        .title-bar-text {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .user-panel-status { font-size: 11px; color: var(--text-muted); }
+        .settings-btn {
+            width: 32px; height: 32px; border-radius: 6px;
+            background: transparent; border: none; color: var(--text-secondary);
+            cursor: pointer; font-size: 16px; display: flex;
+            align-items: center; justify-content: center; transition: all 0.15s;
         }
+        .settings-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
 
-        .title-bar-controls {
-            display: flex;
-            gap: 2px;
+        /* ===== MAIN CHAT ===== */
+        .main-chat { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        .chat-header {
+            height: 48px; padding: 0 16px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 10px; flex-shrink: 0;
         }
-
-        .title-bar-controls button {
-            width: 18px;
-            height: 18px;
-            font-size: 10px;
-            padding: 0;
-            font-weight: bold;
-            cursor: pointer;
+        .chat-header .hash { font-size: 22px; color: var(--text-muted); font-weight: 300; }
+        .chat-header .channel-name { font-size: 15px; font-weight: 700; }
+        .chat-header .divider {
+            width: 1px; height: 20px; background: var(--border); margin: 0 6px;
         }
-
-        .window-body {
-            padding: 10px;
-            background: #c0c0c0;
+        .chat-header .channel-topic {
+            font-size: 13px; color: var(--text-muted); flex: 1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-
-        /* ====== BUTTONS ====== */
-        button {
-            background: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
-            padding: 5px 15px;
-            font-family: 'Comic Sans MS';
-            cursor: pointer;
-            font-size: 14px;
+        .header-actions { display: flex; gap: 4px; }
+        .header-actions button {
+            width: 32px; height: 32px; border-radius: 6px;
+            background: transparent; border: none; color: var(--text-secondary);
+            cursor: pointer; font-size: 16px; transition: all 0.15s;
         }
+        .header-actions button:hover { background: var(--bg-hover); color: var(--text-primary); }
 
-        button:active {
-            border-color: #000000 #ffffff #ffffff #000000;
+        /* ===== MESSAGES ===== */
+        .messages-container {
+            flex: 1; overflow-y: auto; padding: 16px 0;
         }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* ====== INPUTS ====== */
-        input[type="text"], input[type="password"] {
-            padding: 5px;
-            border: 2px inset #808080;
-            font-family: 'Comic Sans MS';
-            font-size: 14px;
-        }
-
-        input[type="color"] {
-            width: 50px;
-            height: 30px;
-            border: 2px inset #808080;
-            cursor: pointer;
-        }
-
-        input[type="range"] {
-            width: 100%;
-        }
-
-        input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-        }
-
-        select {
-            padding: 5px;
-            border: 2px inset #808080;
-            font-family: 'Comic Sans MS';
-        }
-
-        /* ====== CHAT WINDOW ====== */
-        .chat-window {
-            width: 780px;
-            height: 600px;
-            top: 50px;
-            left: 50px;
-        }
-
-        .menu-bar {
-            background: #c0c0c0;
-            border-bottom: 2px solid #808080;
-            display: flex;
-            gap: 5px;
-            padding: 2px;
-        }
-
-        .menu-item {
-            padding: 4px 10px;
-            cursor: pointer;
-            position: relative;
-            user-select: none;
-        }
-
-        .menu-item:hover {
-            background: #000080;
-            color: white;
-        }
-
-        .dropdown {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
-            min-width: 180px;
-            z-index: 1000;
-        }
-
-        .dropdown.show {
-            display: block;
-        }
-
-        .dropdown-item {
-            padding: 5px 20px;
-            cursor: pointer;
-        }
-
-        .dropdown-item:hover {
-            background: #000080;
-            color: white;
-        }
-
-        /* ====== ROOMS ====== */
-        .rooms-selector {
-            display: flex;
-            gap: 5px;
-            padding: 5px;
-            background: #c0c0c0;
-            border-bottom: 2px solid #808080;
-        }
-
-        .room-tab {
-            padding: 5px 15px;
-            background: #808080;
-            border: 2px solid;
-            border-color: #000000 #ffffff #ffffff #000000;
-            cursor: pointer;
-            font-size: 12px;
-            user-select: none;
-        }
-
-        .room-tab.active {
-            background: #c0c0c0;
-            border-color: #ffffff #000000 #000000 #ffffff;
-        }
-
-        .room-tab:hover:not(.active) {
-            background: #909090;
-        }
-
-        /* ====== CHAT CONTAINER ====== */
-        .chat-container {
-            display: flex;
-            height: 440px;
-            gap: 10px;
-        }
-
-        .users-panel {
-            width: 180px;
-            border: 2px inset #808080;
-            background: white;
-            padding: 5px;
-            overflow-y: auto;
-        }
-
-        .user-item {
-            padding: 3px;
-            margin: 2px 0;
-            background: #c0c0c0;
-            border: 1px solid #808080;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .user-status {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .user-status.online { background: #00ff00; }
-        .user-status.away { background: #ffff00; }
-        .user-status.busy { background: #ff0000; }
-
-        .messages-area {
-            flex: 1;
-            border: 2px inset #808080;
-            background: white;
-            padding: 10px;
-            overflow-y: auto;
-            font-size: 14px;
-        }
-
         .message {
-            margin-bottom: 10px;
-            word-wrap: break-word;
+            padding: 4px 16px; display: flex; gap: 12px;
+            transition: background 0.1s;
         }
-
-        .message-header {
-            font-weight: bold;
-            color: #000080;
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .message:hover { background: var(--bg-hover); }
+        .message + .message { margin-top: 2px; }
+        .message-new-group { margin-top: 16px; }
+        .msg-avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 15px; color: #000; flex-shrink: 0;
+            margin-top: 2px;
         }
-
-        .message-system {
+        .msg-body { flex: 1; min-width: 0; }
+        .msg-header { display: flex; align-items: baseline; gap: 8px; }
+        .msg-author { font-size: 14px; font-weight: 600; cursor: pointer; }
+        .msg-author:hover { text-decoration: underline; }
+        .msg-time { font-size: 11px; color: var(--text-muted); }
+        .msg-text {
+            font-size: 14px; color: var(--text-primary);
+            line-height: 1.5; margin-top: 2px; word-wrap: break-word;
+        }
+        .msg-text .mention {
+            background: var(--mention-bg); color: var(--accent);
+            padding: 0 3px; border-radius: 3px; font-weight: 600;
+        }
+        .msg-image {
+            max-width: 400px; max-height: 300px; border-radius: 8px;
+            margin-top: 6px; cursor: pointer; transition: opacity 0.2s;
+        }
+        .msg-image:hover { opacity: 0.9; }
+        .msg-reactions { display: flex; gap: 4px; margin-top: 4px; }
+        .reaction-chip {
+            padding: 2px 8px; border-radius: 12px; font-size: 12px;
+            background: var(--bg-tertiary); border: 1px solid var(--border);
+            cursor: pointer; transition: all 0.15s; color: var(--text-secondary);
+        }
+        .reaction-chip:hover { border-color: var(--accent); background: var(--accent-dim); }
+        .msg-system {
+            padding: 4px 16px; display: flex; align-items: center; gap: 8px;
+        }
+        .msg-system-text {
+            font-size: 13px; color: var(--text-muted); font-style: italic;
+        }
+        .msg-system-dot {
+            width: 4px; height: 4px; border-radius: 50%;
+            background: var(--text-muted); flex-shrink: 0;
+        }
+        .msg-action {
+            padding: 4px 16px; font-size: 14px; color: var(--text-secondary);
             font-style: italic;
-            color: #808080;
-            font-size: 12px;
         }
-
-        .message-action {
-            font-style: italic;
-            color: #006400;
-        }
-
-        .message-error {
-            color: #ff0000;
-            font-weight: bold;
-        }
-
-        .timestamp {
-            color: #808080;
-            font-size: 11px;
-        }
-
-        .message-content {
-            color: #000000;
-            margin-left: 10px;
-        }
-
-        .message-highlight {
-            background: #ffff00;
-            padding: 2px;
-            font-weight: bold;
-        }
-
-        .message-image {
-            max-width: 500px;
-            max-height: 500px;
-            margin: 5px 0;
-            border: 2px solid #808080;
-            image-rendering: pixelated;
-            image-rendering: -moz-crisp-edges;
-            image-rendering: crisp-edges;
-            cursor: pointer;
-        }
-
-        .reaction-button {
-            font-size: 11px;
-            padding: 2px 6px;
-            margin-left: 5px;
-            cursor: pointer;
+        .msg-error {
+            padding: 4px 16px; font-size: 13px; color: var(--dnd);
+            display: flex; align-items: center; gap: 6px;
         }
 
         .typing-indicator {
-            font-style: italic;
-            color: #808080;
-            font-size: 12px;
-            margin: 5px 0;
-            min-height: 18px;
+            height: 24px; padding: 0 16px; font-size: 12px;
+            color: var(--text-muted); display: flex; align-items: center;
+            flex-shrink: 0;
         }
 
+        /* ===== INPUT ===== */
         .input-area {
-            margin-top: 10px;
-            display: flex;
-            gap: 5px;
-            align-items: center;
+            padding: 0 16px 20px; flex-shrink: 0;
+        }
+        .input-wrapper {
+            display: flex; align-items: center; gap: 0;
+            background: var(--bg-tertiary); border-radius: 8px;
+            border: 1px solid var(--border); transition: border 0.2s;
+        }
+        .input-wrapper:focus-within { border-color: var(--accent); }
+        .upload-btn {
+            width: 44px; height: 44px; background: transparent;
+            border: none; color: var(--text-muted); font-size: 22px;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; border-radius: 8px 0 0 8px; transition: color 0.15s;
+        }
+        .upload-btn:hover { color: var(--accent); }
+        .msg-input {
+            flex: 1; padding: 10px 0; font-size: 14px;
+            background: transparent; border: none; color: var(--text-primary);
+            font-family: inherit; outline: none;
+        }
+        .msg-input::placeholder { color: var(--text-muted); }
+        .send-btn {
+            width: 44px; height: 44px; background: transparent;
+            border: none; color: var(--accent); font-size: 18px;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; border-radius: 0 8px 8px 0; transition: all 0.15s;
+        }
+        .send-btn:hover { background: var(--accent-dim); }
+
+        /* ===== MEMBERS SIDEBAR ===== */
+        .members-sidebar {
+            width: 240px; background: var(--bg-secondary);
+            border-left: 1px solid var(--border);
+            overflow-y: auto; flex-shrink: 0; padding: 16px 8px;
+        }
+        .members-sidebar.hidden { display: none; }
+        .members-category {
+            padding: 8px 8px 4px; font-size: 11px; font-weight: 700;
+            color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .member-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 6px 8px; border-radius: 6px; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .member-item:hover { background: var(--bg-hover); }
+        .member-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 12px; color: #000;
+            position: relative; flex-shrink: 0;
+        }
+        .member-status-dot {
+            position: absolute; bottom: -1px; right: -1px;
+            width: 10px; height: 10px; border-radius: 50%;
+            border: 2px solid var(--bg-secondary);
+        }
+        .member-name {
+            font-size: 13px; font-weight: 500; color: var(--text-secondary);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
 
-        .status-bar {
-            background: #c0c0c0;
-            border-top: 2px solid #ffffff;
-            padding: 2px 5px;
-            font-size: 11px;
-            display: flex;
-            gap: 20px;
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: none; align-items: center; justify-content: center;
+            z-index: 5000; animation: fadeIn 0.15s;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--bg-secondary); border-radius: 12px;
+            border: 1px solid var(--border); width: 600px;
+            max-width: 90vw; max-height: 80vh; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+        }
+        .modal-header {
+            padding: 16px 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 700; }
+        .modal-close {
+            width: 32px; height: 32px; border-radius: 50%; background: transparent;
+            border: none; color: var(--text-secondary); font-size: 18px;
+            cursor: pointer; transition: all 0.15s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .modal-close:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .modal-tabs {
+            display: flex; border-bottom: 1px solid var(--border);
+            padding: 0 20px; gap: 0;
+        }
+        .modal-tab {
+            padding: 12px 16px; font-size: 13px; font-weight: 600;
+            color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent;
+            transition: all 0.15s;
+        }
+        .modal-tab:hover { color: var(--text-secondary); }
+        .modal-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .setting-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 0; border-bottom: 1px solid var(--border);
+        }
+        .setting-row:last-child { border-bottom: none; }
+        .setting-label { font-size: 14px; font-weight: 500; }
+        .setting-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .setting-row select, .setting-row input[type="color"] {
+            background: var(--bg-tertiary); border: 1px solid var(--border);
+            color: var(--text-primary); padding: 6px 10px; border-radius: 6px;
+            font-family: inherit; font-size: 13px; cursor: pointer;
+        }
+        .setting-row input[type="color"] { width: 44px; height: 32px; padding: 2px; }
+        .setting-row input[type="checkbox"] {
+            width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer;
         }
 
-        /* ====== LOGIN WINDOW ====== */
-        .login-window {
-            width: 480px;
-            height: 420px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+        /* Theme Grid */
+        .theme-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; margin-top: 12px;
         }
-
-        .login-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            padding: 20px;
+        .theme-card {
+            padding: 12px; border-radius: 8px; border: 2px solid var(--border);
+            cursor: pointer; transition: all 0.15s; text-align: center;
         }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+        .theme-card:hover { border-color: var(--text-muted); }
+        .theme-card.active { border-color: var(--accent); }
+        .theme-preview {
+            height: 40px; border-radius: 4px; margin-bottom: 8px;
+            display: flex; overflow: hidden;
         }
+        .theme-preview div { flex: 1; }
+        .theme-card-name { font-size: 12px; font-weight: 600; }
 
-        .form-group label {
-            font-weight: bold;
+        /* Achievements */
+        .ach-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px; margin-bottom: 8px; border-radius: 8px;
+            background: var(--bg-tertiary); border: 1px solid var(--border);
         }
+        .ach-item.locked { opacity: 0.4; }
+        .ach-icon { font-size: 28px; }
+        .ach-info { flex: 1; }
+        .ach-title { font-size: 14px; font-weight: 600; }
+        .ach-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-        .form-group input {
-            padding: 8px;
-            border: 2px inset #808080;
-            font-family: 'Comic Sans MS';
-        }
-
-        /* ====== OTHER WINDOWS ====== */
-        .about-window {
-            width: 520px;
-            height: 450px;
-            top: 100px;
-            left: 150px;
-        }
-
-        .about-content {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .about-content h1 {
-            color: #000080;
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-
-        .about-content p {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .settings-window {
-            width: 540px;
-            height: 520px;
-            top: 120px;
-            left: 200px;
-        }
-
-        .settings-content {
-            padding: 15px;
-            max-height: 420px;
-            overflow-y: auto;
-        }
-
-        .setting-item {
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .setting-item label {
-            flex: 1;
-        }
-
-        .achievements-window {
-            width: 540px;
-            height: 460px;
-            top: 100px;
-            left: 250px;
-        }
-
-        .achievements-list {
-            padding: 15px;
-            max-height: 380px;
-            overflow-y: auto;
-        }
-
-        .achievement-item {
-            padding: 12px;
-            margin: 10px 0;
-            background: white;
-            border: 2px solid #808080;
-        }
-
-        .achievement-item.locked {
-            opacity: 0.5;
-        }
-
-        .achievement-item-title {
-            font-weight: bold;
-            color: #000080;
-        }
-
-        .achievement-item-desc {
-            font-size: 12px;
-            color: #606060;
-            margin-top: 5px;
-        }
-
-        .help-window {
-            width: 580px;
-            height: 540px;
-            top: 80px;
-            left: 180px;
-        }
-
-        .help-content {
-            padding: 15px;
-            max-height: 460px;
-            overflow-y: auto;
-        }
-
-        .help-section {
-            margin: 15px 0;
-        }
-
-        .help-section h3 {
-            color: #000080;
-            margin-bottom: 10px;
-        }
-
-        .help-section ul {
-            list-style-position: inside;
-            margin-left: 10px;
-        }
-
-        .help-section li {
-            margin: 5px 0;
-        }
-
-        .pm-window {
-            width: 440px;
-            height: 340px;
-            top: 150px;
-            left: 300px;
-        }
-
+        /* ===== PM MODAL ===== */
+        .pm-modal { width: 440px; }
         .pm-messages {
-            height: 240px;
-            border: 2px inset #808080;
-            background: white;
-            padding: 10px;
-            overflow-y: auto;
-            font-size: 12px;
+            height: 250px; overflow-y: auto; padding: 12px;
+            background: var(--bg-primary); border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .pm-msg { margin-bottom: 8px; font-size: 13px; }
+        .pm-input-row { display: flex; gap: 8px; }
+        .pm-input-row input {
+            flex: 1; padding: 10px; font-size: 13px;
+            background: var(--bg-tertiary); border: 1px solid var(--border);
+            border-radius: 6px; color: var(--text-primary);
+            font-family: inherit; outline: none;
+        }
+        .pm-input-row input:focus { border-color: var(--accent); }
+
+        /* ===== TOASTS ===== */
+        .toast-container {
+            position: fixed; bottom: 20px; right: 20px;
+            display: flex; flex-direction: column; gap: 8px; z-index: 8000;
+        }
+        .toast {
+            background: var(--bg-floating); border: 1px solid var(--border);
+            border-left: 3px solid var(--accent); border-radius: 6px;
+            padding: 12px 16px; min-width: 280px; max-width: 360px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            animation: slideUp 0.3s ease; font-size: 13px;
+        }
+        .toast-title { font-weight: 600; margin-bottom: 4px; font-size: 12px; color: var(--accent); }
+        .toast-text { color: var(--text-secondary); }
+        .toast-achievement {
+            border-left-color: #ffd700;
+            background: linear-gradient(135deg, var(--bg-floating), rgba(201,162,39,0.1));
         }
 
-        .pm-input-area {
-            margin-top: 10px;
-            display: flex;
-            gap: 5px;
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes slideUp { from { transform:translateY(20px);opacity:0; } to { transform:translateY(0);opacity:1; } }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .members-sidebar { display: none; }
+        }
+        @media (max-width: 600px) {
+            .sidebar { width: 60px; }
+            .sidebar-header h2, .channel-category, .channel span,
+            .user-panel-info { display: none; }
+            .channel { justify-content: center; padding: 10px; margin: 2px 4px; }
+            .user-panel { justify-content: center; }
         }
 
-        /* ====== POPUPS ====== */
-        .notification {
-            position: fixed;
-            top: 50px;
-            right: 50px;
-            background: #ffffcc;
-            border: 2px solid #000000;
-            padding: 15px;
-            max-width: 300px;
-            display: none;
-            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-            z-index: 10000;
-        }
-
-        .notification.show {
-            display: block;
-            animation: slideIn 0.3s;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(400px); }
-            to { transform: translateX(0); }
-        }
-
-        .achievement-popup {
-            position: fixed;
-            top: 100px;
-            right: 50px;
-            background: #000080;
-            color: white;
-            border: 2px solid #ffffff;
-            padding: 15px;
-            width: 320px;
-            display: none;
-            box-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-            z-index: 10001;
-            animation: achievementSlide 0.5s;
-        }
-
-        @keyframes achievementSlide {
-            from { transform: translateX(400px); }
-            to { transform: translateX(0); }
-        }
-
-        .achievement-popup.show {
-            display: block;
-        }
-
-        .achievement-title {
-            font-weight: bold;
-            font-size: 16px;
-            margin-bottom: 5px;
-        }
-
-        .achievement-desc {
-            font-size: 13px;
-        }
-
-        .win95-error {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
-            width: 420px;
-            display: none;
-            z-index: 10002;
-        }
-
-        .win95-error.show {
-            display: block;
-        }
-
-        .error-title-bar {
-            background: #000080;
-            color: white;
-            padding: 3px 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-        }
-
-        .error-body {
-            padding: 20px;
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
-        }
-
-        .error-icon {
-            font-size: 32px;
-        }
-
-        .error-message {
-            flex: 1;
-            font-size: 14px;
-        }
-
-        .error-buttons {
-            padding: 10px;
-            text-align: center;
-        }
-
-        /* ====== TASKBAR ====== */
-        .taskbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 40px;
-            background: #c0c0c0;
-            border-top: 2px solid #ffffff;
-            display: flex;
-            align-items: center;
-            padding: 2px;
-            gap: 5px;
-            z-index: 200;
-        }
-
-        .start-button {
-            height: 32px;
-            padding: 0 20px;
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        .start-menu {
-            display: none;
-            position: absolute;
-            bottom: 42px;
-            left: 2px;
-            background: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #000000 #000000 #ffffff;
-            min-width: 220px;
-            z-index: 1000;
-        }
-
-        .start-menu.show {
-            display: block;
-        }
-
-        .start-menu-item {
-            padding: 8px 20px;
-            cursor: pointer;
-            border-bottom: 1px solid #808080;
-        }
-
-        .start-menu-item:hover {
-            background: #000080;
-            color: white;
-        }
-
-        .start-menu-separator {
-            height: 2px;
-            background: #808080;
-            margin: 2px 0;
-        }
-
-        .window-button {
-            height: 32px;
-            padding: 0 15px;
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .clock {
-            margin-left: auto;
-            padding: 0 10px;
-            border: 2px inset #808080;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            font-size: 12px;
-        }
-
-        .pixel-canvas {
-            display: none;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <div class="desktop">
-        <!-- Desktop Icon -->
-        <div class="desktop-icon" ondblclick="openChatWindow()">
-            <div class="desktop-icon-image">&#128172;</div>
-            <div class="desktop-icon-label">RetroChat95<br>BETA</div>
-        </div>
 
-        <!-- Login Window -->
-        <div class="window login-window active" id="loginWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">RetroChat95 BETA - Login</div>
+    <!-- ===== LOGIN ===== -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-bg"></div>
+        <div class="login-card">
+            <div class="login-logo">
+                <h1>ARABIAC</h1>
+                <p>Welcome back! Let's get chatting.</p>
             </div>
-            <div class="window-body">
-                <div class="login-form">
-                    <div style="text-align: center; margin-bottom: 15px;">
-                        <h2 style="color: #000080;">Welcome to RetroChat95!</h2>
-                        <p style="font-size: 12px; color: #606060; margin-top: 5px;">The kewlest chat on the internet</p>
-                    </div>
-                    <div class="form-group">
-                        <label>Username:</label>
-                        <input type="text" id="usernameInput" placeholder="Enter your username" maxlength="20">
-                    </div>
-                    <div class="form-group">
-                        <label>Password (optional - for saving your account):</label>
-                        <input type="password" id="passwordInput" placeholder="Leave blank for guest mode">
-                    </div>
-                    <div class="form-group">
-                        <label>Choose Your Color:</label>
-                        <input type="color" id="userColor" value="#ff00ff">
-                    </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button onclick="login(false)" style="flex: 1; padding: 10px;">Login / Register</button>
-                        <button onclick="login(true)" style="flex: 1; padding: 10px;">Guest Mode</button>
-                    </div>
-                    <p style="text-align: center; margin-top: 15px; font-size: 11px; color: #808080; line-height: 1.4;">
-                        <strong>Registered accounts:</strong> Save achievements & settings<br>
-                        <strong>Guest mode:</strong> Chat without saving progress
-                    </p>
-                </div>
+            <div class="form-field">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter your username" maxlength="20">
             </div>
-        </div>
-
-        <!-- Main Chat Window -->
-        <div class="window chat-window" id="chatWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">RetroChat95 BETA - #<span id="currentRoom">general</span></div>
-                <div class="title-bar-controls">
-                    <button onclick="minimizeWindow('chatWindow')">_</button>
-                    <button onclick="closeWindow('chatWindow')">X</button>
-                </div>
+            <div class="form-field">
+                <label>Password <span style="font-weight:400;text-transform:none">(optional — for saving account)</span></label>
+                <input type="password" id="loginPassword" placeholder="Leave blank for guest mode">
             </div>
-            <div class="window-body">
-                <div class="menu-bar">
-                    <div class="menu-item" onclick="toggleDropdown('fileMenu')">
-                        File
-                        <div class="dropdown" id="fileMenu">
-                            <div class="dropdown-item" onclick="showSettings(); closeAllDropdowns();">Settings</div>
-                            <div class="dropdown-item" onclick="downloadChatLog(); closeAllDropdowns();">Download Chat Log</div>
-                            <div class="dropdown-item" onclick="clearChat(); closeAllDropdowns();">Clear Chat</div>
-                        </div>
-                    </div>
-                    <div class="menu-item" onclick="toggleDropdown('viewMenu')">
-                        View
-                        <div class="dropdown" id="viewMenu">
-                            <div class="dropdown-item" onclick="showAchievements(); closeAllDropdowns();">Achievements</div>
-                            <div class="dropdown-item" onclick="toggleCRTMode(); closeAllDropdowns();">Toggle CRT Mode</div>
-                        </div>
-                    </div>
-                    <div class="menu-item" onclick="toggleDropdown('helpMenu')">
-                        Help
-                        <div class="dropdown" id="helpMenu">
-                            <div class="dropdown-item" onclick="showHelp(); closeAllDropdowns();">Commands</div>
-                            <div class="dropdown-item" onclick="showAbout(); closeAllDropdowns();">About</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Room Tabs -->
-                <div class="rooms-selector">
-                    <div class="room-tab active" data-room="general" onclick="switchRoom('general')">#general</div>
-                    <div class="room-tab" data-room="random" onclick="switchRoom('random')">#random</div>
-                    <div class="room-tab" data-room="images" onclick="switchRoom('images')">#images</div>
-                    <div class="room-tab" data-room="windows" onclick="switchRoom('windows')">#windows</div>
-                </div>
-
-                <div class="chat-container">
-                    <div class="users-panel">
-                        <div style="font-weight: bold; margin-bottom: 5px; border-bottom: 1px solid #000; padding-bottom: 3px;">
-                            ONLINE USERS
-                        </div>
-                        <div id="usersList"></div>
-                    </div>
-
-                    <div class="messages-area" id="messagesArea">
-                        <div class="message message-system">
-                            <div class="message-content">
-                                Welcome to RetroChat95 BETA! Type /help to see all commands.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="typing-indicator" id="typingIndicator"></div>
-                
-                <div class="input-area">
-                    <button onclick="triggerImageUpload()" title="Upload an image">Image</button>
-                    <input type="file" id="imageInput" accept="image/*" style="display:none;">
-                    <input type="text" id="messageInput" placeholder="Type message or /help..." maxlength="500" autocomplete="off" style="flex: 1;">
-                    <button onclick="sendMessage()">SEND</button>
-                </div>
-
-                <div class="status-bar">
-                    <span id="statusText">Connected</span>
-                    <span id="messageCount">Messages: 0</span>
-                    <span id="userCount">Users: 0</span>
-                    <span id="roomInfo">Room: #general</span>
-                </div>
+            <div class="form-field">
+                <label>Display Color</label>
+                <input type="color" id="loginColor" value="#c9a227">
             </div>
-        </div>
-
-        <!-- About Window -->
-        <div class="window about-window" id="aboutWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">About RetroChat95 BETA</div>
-                <div class="title-bar-controls">
-                    <button onclick="closeWindow('aboutWindow')">X</button>
-                </div>
+            <div class="login-buttons">
+                <button class="btn btn-primary" onclick="doLogin(false)">Login / Register</button>
+                <button class="btn btn-secondary" onclick="doLogin(true)">Guest</button>
             </div>
-            <div class="window-body">
-                <div class="about-content">
-                    <h1>RetroChat95</h1>
-                    <p><strong>Version:</strong>Beta retroslop release</p>
-                    <p><strong>Released:</strong> January 2026</p>
-                    <p style="margin-top: 15px;">The kewlest chat experience on the web!</p>
-                    
-                    <p style="margin-top: 25px; text-align: left; margin-left: 60px; line-height: 2;">
-                        <strong>Features:</strong><br>
-                        [x] Multi-room chat (4 rooms)<br>
-                        [x] Private messaging<br>
-                        [x] Image uploads & keywords<br>
-                        [x] Achievement system<br>
-                        [x] Account persistence<br>
-                        [x] Database storage<br>
-                        [x] Slash commands<br>
-                        [x] Message reactions<br>
-                        [x] CRT mode effect<br>
-                        [x] Draggable windows<br>
-                        [x] Pure 90s nostalgia
-                    </p>
-                    
-                    <button onclick="closeWindow('aboutWindow')" style="margin-top: 25px;">OK</button>
-                </div>
+            <div class="login-footer">
+                <strong>Registered:</strong> saves achievements & settings<br>
+                <strong>Guest:</strong> instant access, no saving
             </div>
-        </div>
-
-        <!-- Settings Window -->
-        <div class="window settings-window" id="settingsWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">Settings</div>
-                <div class="title-bar-controls">
-                    <button onclick="closeWindow('settingsWindow')">X</button>
-                </div>
-            </div>
-            <div class="window-body">
-                <div class="settings-content">
-                    <div class="setting-item">
-                        <label>Your Username:</label>
-                        <input type="text" id="settingsUsername" readonly style="background: #e0e0e0;">
-                    </div>
-                    <div class="setting-item">
-                        <label>Your Color:</label>
-                        <input type="color" id="settingsColor" value="#ff00ff">
-                    </div>
-                    <div class="setting-item">
-                        <label>Window Border Color:</label>
-                        <input type="color" id="borderColor" value="#000080">
-                    </div>
-                    <div class="setting-item">
-                        <label>Status:</label>
-                        <select id="statusSelect">
-                            <option value="Online">Online</option>
-                            <option value="Away">Away</option>
-                            <option value="Busy">Busy</option>
-                        </select>
-                    </div>
-                    <div class="setting-item">
-                        <label>Show Notifications:</label>
-                        <input type="checkbox" id="notifToggle" checked>
-                    </div>
-                    <div class="setting-item">
-                        <label>CRT Mode (Retro Effect):</label>
-                        <input type="checkbox" id="crtToggle">
-                    </div>
-                    <div class="setting-item">
-                        <label>Message Delay (ms):</label>
-                        <input type="range" id="messageDelay" min="0" max="2000" value="0" step="100" style="width: 150px;">
-                        <span id="delayValue">0</span>
-                    </div>
-                    <div class="setting-item">
-                        <label>Image Pixelation Level:</label>
-                        <input type="range" id="pixelLevel" min="1" max="10" value="3" style="width: 150px;">
-                        <span id="pixelValue">3</span>
-                    </div>
-                    <button onclick="saveSettings()" style="margin-top: 25px; width: 100%; padding: 10px;">SAVE SETTINGS</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Achievements Window -->
-        <div class="window achievements-window" id="achievementsWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">Achievements</div>
-                <div class="title-bar-controls">
-                    <button onclick="closeWindow('achievementsWindow')">X</button>
-                </div>
-            </div>
-            <div class="window-body">
-                <div class="achievements-list" id="achievementsList">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Help Window -->
-        <div class="window help-window" id="helpWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">Help - Commands & Features</div>
-                <div class="title-bar-controls">
-                    <button onclick="closeWindow('helpWindow')">X</button>
-                </div>
-            </div>
-            <div class="window-body">
-                <div class="help-content">
-                    <div class="help-section">
-                        <h3>Slash Commands</h3>
-                        <ul>
-                            <li><strong>/me [action]</strong> - Perform an action (e.g., /me dances)</li>
-                            <li><strong>/nick [name]</strong> - Change username (guests only)</li>
-                            <li><strong>/color #RRGGBB</strong> - Change text color (e.g., /color #FF0000)</li>
-                            <li><strong>/clear</strong> - Clear your chat history</li>
-                            <li><strong>/status [status]</strong> - Set status (Online, Away, or Busy)</li>
-                            <li><strong>/join [room]</strong> - Join a room (general, random, images, windows)</li>
-                            <li><strong>/msg [user] [text]</strong> - Send private message to user</li>
-                            <li><strong>/help</strong> - Show this help window</li>
-                        </ul>
-                    </div>
-                    <div class="help-section">
-                        <h3>Image Keywords</h3>
-                        <p>Type these to instantly send images:</p>
-                        <ul>
-                            <li><strong>!dog</strong> - Cute dog image</li>
-                            <li><strong>!cat</strong> - Cat image</li>
-                            <li><strong>!lol</strong> - Laughing face</li>
-                            <li><strong>!windows</strong> - Windows 95 logo</li>
-                            <li><strong>!error</strong> - Error icon</li>
-                            <li><strong>!cool</strong> - Cool face</li>
-                            <li><strong>!fire</strong> - Fire image</li>
-                        </ul>
-                    </div>
-                    <div class="help-section">
-                        <h3>Features</h3>
-                        <ul>
-                            <li>Multi-room chat (4 different rooms)</li>
-                            <li>Private messaging between users</li>
-                            <li>Message reactions (thumbs up)</li>
-                            <li>Image uploads with auto-pixelation</li>
-                            <li>Achievement system (earn badges!)</li>
-                            <li>Account system (save your progress)</li>
-                            <li>Message history (see past messages)</li>
-                            <li>@mention highlights (tag other users)</li>
-                            <li>CRT mode (authentic retro effect)</li>
-                            <li>Fully draggable windows</li>
-                        </ul>
-                    </div>
-                    <div class="help-section">
-                        <h3>Tips</h3>
-                        <ul>
-                            <li>Press Enter to send messages quickly</li>
-                            <li>Drag windows by their title bar</li>
-                            <li>Click on images to view them full-size</li>
-                            <li>Type @ followed by a username to mention them</li>
-                            <li>Registered accounts save achievements automatically</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- PM Window -->
-        <div class="window pm-window" id="pmWindow">
-            <div class="title-bar" onmousedown="startDrag(event, this.parentElement)">
-                <div class="title-bar-text">PM: <span id="pmTarget">User</span></div>
-                <div class="title-bar-controls">
-                    <button onclick="closeWindow('pmWindow')">X</button>
-                </div>
-            </div>
-            <div class="window-body">
-                <div class="pm-messages" id="pmMessages"></div>
-                <div class="pm-input-area">
-                    <input type="text" id="pmInput" placeholder="Type private message..." autocomplete="off" style="flex: 1;">
-                    <button onclick="sendPM()">Send</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notification -->
-        <div class="notification" id="notification">
-            <div style="font-weight: bold; margin-bottom: 5px;">New Message</div>
-            <div id="notificationText"></div>
-        </div>
-
-        <!-- Achievement Popup -->
-        <div class="achievement-popup" id="achievementPopup">
-            <div class="achievement-title">[!] Achievement Unlocked!</div>
-            <div class="achievement-desc" id="achievementDesc"></div>
-        </div>
-
-        <!-- Win95 Error Popup -->
-        <div class="win95-error" id="win95Error">
-            <div class="error-title-bar">
-                <span>Error</span>
-                <button onclick="closeWin95Error()" style="width: 16px; height: 16px; padding: 0;">X</button>
-            </div>
-            <div class="error-body">
-                <div class="error-icon">&#9888;</div>
-                <div class="error-message" id="errorMessage"></div>
-            </div>
-            <div class="error-buttons">
-                <button onclick="closeWin95Error()">OK</button>
-            </div>
-        </div>
-
-        <!-- Taskbar -->
-        <div class="taskbar">
-            <button class="start-button" onclick="toggleStartMenu()">Start</button>
-            <div class="start-menu" id="startMenu">
-                <div class="start-menu-item" onclick="showSettings(); toggleStartMenu();">Settings</div>
-                <div class="start-menu-item" onclick="showAchievements(); toggleStartMenu();">Achievements</div>
-                <div class="start-menu-item" onclick="showHelp(); toggleStartMenu();">Help</div>
-                <div class="start-menu-item" onclick="showAbout(); toggleStartMenu();">About</div>
-                <div class="start-menu-separator"></div>
-                <div class="start-menu-item" onclick="downloadChatLog(); toggleStartMenu();">Download Log</div>
-                <div class="start-menu-item" onclick="clearChat(); toggleStartMenu();">Clear Chat</div>
-            </div>
-            <button class="window-button" onclick="focusWindow('chatWindow')">RetroChat95 BETA</button>
-            <div class="clock" id="clock">12:00 PM</div>
         </div>
     </div>
 
-    <canvas id="pixelCanvas" class="pixel-canvas"></canvas>
+    <!-- ===== APP ===== -->
+    <div class="app" id="app">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="status-dot" id="connDot"></div>
+                <h2>ARABIAC</h2>
+            </div>
+            <div class="channels">
+                <div class="channel-category">Text Channels</div>
+                <div class="channel active" data-room="general" onclick="switchRoom('general')">
+                    <span class="hash">#</span><span>general</span>
+                </div>
+                <div class="channel" data-room="random" onclick="switchRoom('random')">
+                    <span class="hash">#</span><span>random</span>
+                </div>
+                <div class="channel" data-room="media" onclick="switchRoom('media')">
+                    <span class="hash">#</span><span>media</span>
+                </div>
+                <div class="channel" data-room="lounge" onclick="switchRoom('lounge')">
+                    <span class="hash">#</span><span>lounge</span>
+                </div>
+            </div>
+            <div class="user-panel">
+                <div class="user-avatar" id="myAvatar" style="background:var(--accent);">?</div>
+                <div class="user-panel-info">
+                    <div class="user-panel-name" id="myName">...</div>
+                    <div class="user-panel-status" id="myStatus">Online</div>
+                </div>
+                <button class="settings-btn" onclick="openSettings()" title="Settings">⚙</button>
+            </div>
+        </div>
+
+        <!-- MAIN CHAT -->
+        <div class="main-chat">
+            <div class="chat-header">
+                <span class="hash">#</span>
+                <span class="channel-name" id="headerChannel">general</span>
+                <span class="divider"></span>
+                <span class="channel-topic" id="headerTopic">General discussion</span>
+                <div class="header-actions">
+                    <button onclick="toggleMembers()" title="Members">👥</button>
+                    <button onclick="downloadLog()" title="Download Log">💾</button>
+                </div>
+            </div>
+            <div class="messages-container" id="messagesArea"></div>
+            <div class="typing-indicator" id="typingIndicator"></div>
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()" title="Upload Image">+</button>
+                    <input type="file" id="fileInput" accept="image/*" style="display:none">
+                    <input type="text" class="msg-input" id="msgInput" placeholder="Message #general" maxlength="500" autocomplete="off">
+                    <button class="send-btn" onclick="sendMessage()" title="Send">➤</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MEMBERS -->
+        <div class="members-sidebar" id="membersSidebar">
+            <div id="membersList"></div>
+        </div>
+    </div>
+
+    <!-- ===== SETTINGS MODAL ===== -->
+    <div class="modal-overlay" id="settingsOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="modal-close" onclick="closeSettings()">✕</button>
+            </div>
+            <div class="modal-tabs">
+                <div class="modal-tab active" onclick="switchTab('profile')">Profile</div>
+                <div class="modal-tab" onclick="switchTab('themes')">Themes</div>
+                <div class="modal-tab" onclick="switchTab('notifs')">Notifications</div>
+                <div class="modal-tab" onclick="switchTab('achievements')">Achievements</div>
+                <div class="modal-tab" onclick="switchTab('help')">Help</div>
+            </div>
+            <div class="modal-body">
+                <!-- PROFILE -->
+                <div class="tab-content active" id="tab-profile">
+                    <div class="setting-row">
+                        <div><div class="setting-label">Username</div></div>
+                        <input type="text" id="setUsername" readonly style="background:var(--bg-tertiary);border:1px solid var(--border);color:var(--text-muted);padding:6px 10px;border-radius:6px;font-family:inherit;">
+                    </div>
+                    <div class="setting-row">
+                        <div><div class="setting-label">Display Color</div></div>
+                        <input type="color" id="setColor" value="#c9a227">
+                    </div>
+                    <div class="setting-row">
+                        <div><div class="setting-label">Status</div></div>
+                        <select id="setStatus">
+                            <option value="Online">🟢 Online</option>
+                            <option value="Away">🟡 Away</option>
+                            <option value="Busy">🔴 Busy</option>
+                        </select>
+                    </div>
+                    <div style="margin-top:20px">
+                        <button class="btn btn-primary" onclick="saveProfile()" style="width:100%">Save Profile</button>
+                    </div>
+                </div>
+                <!-- THEMES -->
+                <div class="tab-content" id="tab-themes">
+                    <div class="setting-label" style="margin-bottom:12px;">Choose a Theme</div>
+                    <div class="theme-grid" id="themeGrid"></div>
+                    <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+                        <div class="setting-label" style="margin-bottom:12px;">Custom Colors</div>
+                        <div class="setting-row">
+                            <div><div class="setting-label">Accent Color</div></div>
+                            <input type="color" id="customAccent" value="#c9a227">
+                        </div>
+                        <div class="setting-row">
+                            <div><div class="setting-label">Background</div></div>
+                            <input type="color" id="customBg" value="#0d0d0d">
+                        </div>
+                        <div class="setting-row">
+                            <div><div class="setting-label">Sidebar</div></div>
+                            <input type="color" id="customSidebar" value="#1a1a1a">
+                        </div>
+                        <button class="btn btn-secondary" onclick="applyCustomTheme()" style="width:100%;margin-top:12px;">Apply Custom</button>
+                    </div>
+                </div>
+                <!-- NOTIFICATIONS -->
+                <div class="tab-content" id="tab-notifs">
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-label">Enable Notifications</div>
+                            <div class="setting-desc">Show toast notifications for new messages</div>
+                        </div>
+                        <input type="checkbox" id="setNotifs" checked>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-label">PM Notifications</div>
+                            <div class="setting-desc">Show popup for private messages</div>
+                        </div>
+                        <input type="checkbox" id="setPmNotifs" checked>
+                    </div>
+                </div>
+                <!-- ACHIEVEMENTS -->
+                <div class="tab-content" id="tab-achievements">
+                    <div id="achList"></div>
+                </div>
+                <!-- HELP -->
+                <div class="tab-content" id="tab-help">
+                    <h4 style="color:var(--accent);margin-bottom:12px;">Slash Commands</h4>
+                    <div style="font-size:13px;line-height:2;color:var(--text-secondary);">
+                        <code>/me &lt;action&gt;</code> — Perform an action<br>
+                        <code>/nick &lt;name&gt;</code> — Change name (guests only)<br>
+                        <code>/color #RRGGBB</code> — Change display color<br>
+                        <code>/clear</code> — Clear your chat view<br>
+                        <code>/status Online|Away|Busy</code> — Set status<br>
+                        <code>/join &lt;room&gt;</code> — Switch rooms<br>
+                        <code>/msg &lt;user&gt; &lt;text&gt;</code> — Private message<br>
+                        <code>/help</code> — Show help in chat
+                    </div>
+                    <h4 style="color:var(--accent);margin:20px 0 12px;">Image Keywords</h4>
+                    <div style="font-size:13px;line-height:2;color:var(--text-secondary);">
+                        <code>!dog</code> <code>!cat</code> <code>!lol</code> <code>!cool</code> <code>!fire</code>
+                    </div>
+                    <h4 style="color:var(--accent);margin:20px 0 12px;">Tips</h4>
+                    <div style="font-size:13px;line-height:2;color:var(--text-secondary);">
+                        Press Enter to send • Double-click a user to PM • Use @username to mention • Upload images with the + button
+                    </div>
+                    <div style="margin-top:30px;padding-top:16px;border-top:1px solid var(--border);text-align:center;color:var(--text-muted);font-size:12px;">
+                        Arabiac v1.0.0
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PM MODAL ===== -->
+    <div class="modal-overlay" id="pmOverlay">
+        <div class="modal pm-modal">
+            <div class="modal-header">
+                <h3>PM — <span id="pmTargetName">User</span></h3>
+                <button class="modal-close" onclick="closePM()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="pm-messages" id="pmMessages"></div>
+                <div class="pm-input-row">
+                    <input type="text" id="pmInput" placeholder="Type a message..." autocomplete="off">
+                    <button class="btn btn-primary btn-small" onclick="sendPM()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOASTS -->
+    <div class="toast-container" id="toastContainer"></div>
 
 <script>
-    // ==================== RETROCHAT95 BETA - CLIENT JAVASCRIPT ====================
-    
-    // GLOBAL VARIABLES
-    let currentUser = '';
-    let userColor = '#ff00ff';
-    let userStatus = 'Online';
-    let currentRoom = 'general';
-    let messages = [];
-    let users = [];
-    let messageCount = 0;
-    let pixelationLevel = 3;
-    let typingTimeout;
-    let achievements = [];
-    let messageDelay = 0;
-    let pmTarget = null;
-    let isGuest = false;
+// ======================== STATE ========================
+let currentUser = '';
+let userColor = '#c9a227';
+let userStatus = 'Online';
+let currentRoom = 'general';
+let users = [];
+let messageCount = 0;
+let achievements = [];
+let pmTarget = null;
+let isGuest = false;
+let typingTimeout;
+let membersVisible = true;
+let roomMessages = { general:'', random:'', media:'', lounge:'' };
 
-    // ROOM MESSAGE STORAGE
-    let roomMessages = {
-        general: '',
-        random: '',
-        images: '',
-        windows: ''
+const ROOM_TOPICS = {
+    general: 'General discussion',
+    random: 'Random stuff & fun',
+    media: 'Share images & media',
+    lounge: 'Chill & hang out'
+};
+
+const ALL_ACHIEVEMENTS = [
+    { id:'first-message', title:'First Message', desc:'Sent your first message', icon:'💬' },
+    { id:'chatty', title:'Chatty', desc:'Sent 10 messages', icon:'🗣️' },
+    { id:'super-chatty', title:'Super Chatty', desc:'Sent 50 messages', icon:'📢' },
+    { id:'chatterbox', title:'Chatterbox', desc:'Sent 100 messages', icon:'🏆' },
+    { id:'veteran', title:'Veteran', desc:'30 minutes online', icon:'⏰' },
+    { id:'image-poster', title:'Picture Perfect', desc:'Posted an image', icon:'📸' },
+    { id:'room-hopper', title:'Room Hopper', desc:'Visited all rooms', icon:'🚪' },
+    { id:'socialite', title:'Socialite', desc:'Sent a private message', icon:'💌' }
+];
+
+const THEMES = {
+    'midnight-gold': {
+        name:'Midnight Gold',
+        colors:{ '--bg-primary':'#0d0d0d','--bg-secondary':'#1a1a1a','--bg-tertiary':'#252525','--bg-hover':'#2a2a2a','--bg-active':'#333','--bg-floating':'#1e1e1e','--accent':'#c9a227','--accent-hover':'#dbb833','--accent-dim':'rgba(201,162,39,0.15)','--text-primary':'#e8e8e8','--text-secondary':'#a0a0a0','--text-muted':'#606060','--border':'#2d2d2d','--mention-bg':'rgba(201,162,39,0.12)','--scrollbar-thumb':'#404040' },
+        preview:['#0d0d0d','#1a1a1a','#c9a227']
+    },
+    'discord-dark': {
+        name:'Discord Dark',
+        colors:{ '--bg-primary':'#313338','--bg-secondary':'#2b2d31','--bg-tertiary':'#1e1f22','--bg-hover':'#3a3c41','--bg-active':'#43454a','--bg-floating':'#232428','--accent':'#5865f2','--accent-hover':'#4752c4','--accent-dim':'rgba(88,101,242,0.15)','--text-primary':'#dbdee1','--text-secondary':'#96989d','--text-muted':'#72767d','--border':'#3f4147','--mention-bg':'rgba(88,101,242,0.12)','--scrollbar-thumb':'#1a1b1e' },
+        preview:['#313338','#2b2d31','#5865f2']
+    },
+    'royal-purple': {
+        name:'Royal Purple',
+        colors:{ '--bg-primary':'#1a0a2e','--bg-secondary':'#16082b','--bg-tertiary':'#2d1b4e','--bg-hover':'#341f57','--bg-active':'#3e2565','--bg-floating':'#1e0e35','--accent':'#a855f7','--accent-hover':'#c084fc','--accent-dim':'rgba(168,85,247,0.15)','--text-primary':'#e8e0f0','--text-secondary':'#a090b0','--text-muted':'#605070','--border':'#3d2860','--mention-bg':'rgba(168,85,247,0.12)','--scrollbar-thumb':'#4a2e70' },
+        preview:['#1a0a2e','#16082b','#a855f7']
+    },
+    'ocean-depths': {
+        name:'Ocean Depths',
+        colors:{ '--bg-primary':'#0a1628','--bg-secondary':'#0d1b30','--bg-tertiary':'#152238','--bg-hover':'#1a2940','--bg-active':'#1f304a','--bg-floating':'#0e1e35','--accent':'#06b6d4','--accent-hover':'#22d3ee','--accent-dim':'rgba(6,182,212,0.15)','--text-primary':'#e0f0f8','--text-secondary':'#80a0b0','--text-muted':'#506070','--border':'#1e3448','--mention-bg':'rgba(6,182,212,0.12)','--scrollbar-thumb':'#2a4058' },
+        preview:['#0a1628','#0d1b30','#06b6d4']
+    },
+    'emerald-night': {
+        name:'Emerald Night',
+        colors:{ '--bg-primary':'#0a1a0f','--bg-secondary':'#0d200f','--bg-tertiary':'#152815','--bg-hover':'#1a3018','--bg-active':'#1f381e','--bg-floating':'#0e2212','--accent':'#10b981','--accent-hover':'#34d399','--accent-dim':'rgba(16,185,129,0.15)','--text-primary':'#e0f0e8','--text-secondary':'#80b090','--text-muted':'#507060','--border':'#1e3e28','--mention-bg':'rgba(16,185,129,0.12)','--scrollbar-thumb':'#2a4e32' },
+        preview:['#0a1a0f','#0d200f','#10b981']
+    },
+    'crimson-dark': {
+        name:'Crimson Dark',
+        colors:{ '--bg-primary':'#1a0a0a','--bg-secondary':'#200d0d','--bg-tertiary':'#2a1515','--bg-hover':'#301a1a','--bg-active':'#381e1e','--bg-floating':'#220e0e','--accent':'#ef4444','--accent-hover':'#f87171','--accent-dim':'rgba(239,68,68,0.15)','--text-primary':'#f0e0e0','--text-secondary':'#b08080','--text-muted':'#705050','--border':'#3e1e1e','--mention-bg':'rgba(239,68,68,0.12)','--scrollbar-thumb':'#4e2a2a' },
+        preview:['#1a0a0a','#200d0d','#ef4444']
+    },
+    'arctic': {
+        name:'Arctic Light',
+        colors:{ '--bg-primary':'#ffffff','--bg-secondary':'#f2f3f5','--bg-tertiary':'#e3e5e8','--bg-hover':'#ebedef','--bg-active':'#d3d5d8','--bg-floating':'#f8f8f8','--accent':'#5865f2','--accent-hover':'#4752c4','--accent-dim':'rgba(88,101,242,0.1)','--text-primary':'#2e3338','--text-secondary':'#4f5660','--text-muted':'#96989d','--border':'#e3e5e8','--mention-bg':'rgba(88,101,242,0.08)','--scrollbar-thumb':'#c4c9ce' },
+        preview:['#ffffff','#f2f3f5','#5865f2']
+    }
+};
+
+let currentTheme = 'midnight-gold';
+
+// ======================== SOCKET ========================
+const socket = io({
+    transports: ["websocket", "polling"],
+    reconnection: true, reconnectionDelay: 1000, reconnectionAttempts: 10
+});
+
+// ======================== HELPERS ========================
+function esc(text) {
+    const d = document.createElement('div'); d.textContent = text; return d.innerHTML;
+}
+function getTime() {
+    const n = new Date();
+    return `${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+}
+function getInitial(name) { return (name || '?')[0].toUpperCase(); }
+
+// ======================== THEME ========================
+function applyTheme(id) {
+    const theme = THEMES[id];
+    if (!theme) return;
+    currentTheme = id;
+    Object.entries(theme.colors).forEach(([k,v]) => document.documentElement.style.setProperty(k,v));
+    document.querySelectorAll('.theme-card').forEach(c => {
+        c.classList.toggle('active', c.dataset.theme === id);
+    });
+    localStorage.setItem('arabiac-theme', id);
+}
+
+function applyCustomTheme() {
+    const accent = document.getElementById('customAccent').value;
+    const bg = document.getElementById('customBg').value;
+    const sidebar = document.getElementById('customSidebar').value;
+    document.documentElement.style.setProperty('--accent', accent);
+    document.documentElement.style.setProperty('--accent-hover', accent);
+    document.documentElement.style.setProperty('--accent-dim', accent + '22');
+    document.documentElement.style.setProperty('--mention-bg', accent + '1a');
+    document.documentElement.style.setProperty('--bg-primary', bg);
+    const h = (c,a) => {
+        const n=parseInt(c.replace('#',''),16), R=Math.min(255,(n>>16)+a),
+              G=Math.min(255,((n>>8)&0xFF)+a), B=Math.min(255,(n&0xFF)+a);
+        return '#'+((1<<24)+(R<<16)+(G<<8)+B).toString(16).slice(1);
     };
+    document.documentElement.style.setProperty('--bg-hover', h(bg,20));
+    document.documentElement.style.setProperty('--bg-tertiary', h(bg,24));
+    document.documentElement.style.setProperty('--bg-secondary', sidebar);
+    document.documentElement.style.setProperty('--border', h(sidebar,20));
+    document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
+    showToast('Theme', 'Custom theme applied!');
+}
 
-    // ALL POSSIBLE ACHIEVEMENTS
-    const allAchievements = [
-        { id: 'first-message', title: 'First Message!', desc: 'Sent your first message' },
-        { id: 'chatty', title: 'Chatty', desc: 'Sent 10 messages' },
-        { id: 'super-chatty', title: 'Super Chatty', desc: 'Sent 50 messages' },
-        { id: 'chatterbox', title: 'Chatterbox', desc: 'Sent 100 messages' },
-        { id: 'veteran', title: 'Veteran User', desc: 'Stayed online for 30 minutes' },
-        { id: 'image-poster', title: 'Picture Perfect', desc: 'Posted your first image' },
-        { id: 'room-hopper', title: 'Room Hopper', desc: 'Visited all chat rooms' },
-        { id: 'socialite', title: 'Socialite', desc: 'Sent a private message' }
-    ];
-
-    // ==================== SOCKET.IO CONNECTION ====================
-    // IMPORTANT: UPDATE THIS URL WITH YOUR RAILWAY or WHAT EVER IT IS DEPLOYMENT URL!
-    const socket = io("retrochat95.up.railway.app", {
-        transports: ["websocket", "polling"],
-        reconnection: true,
-        reconnectionDelay: 1000,
-        reconnectionAttempts: 10
+function buildThemeGrid() {
+    const grid = document.getElementById('themeGrid');
+    grid.innerHTML = '';
+    Object.entries(THEMES).forEach(([id, t]) => {
+        const card = document.createElement('div');
+        card.className = `theme-card ${id === currentTheme ? 'active' : ''}`;
+        card.dataset.theme = id;
+        card.onclick = () => applyTheme(id);
+        card.innerHTML = `
+            <div class="theme-preview">
+                ${t.preview.map(c => `<div style="background:${c}"></div>`).join('')}
+            </div>
+            <div class="theme-card-name">${t.name}</div>
+        `;
+        grid.appendChild(card);
     });
+}
 
-    // ==================== WINDOW DRAGGING SYSTEM ====================
-    let isDragging = false;
-    let currentWindow = null;
-    let offsetX = 0;
-    let offsetY = 0;
-    let highestZIndex = 100;
+// ======================== TOASTS ========================
+function showToast(title, text, type = '') {
+    if (!document.getElementById('setNotifs').checked && type !== 'achievement') return;
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type === 'achievement' ? 'toast-achievement' : ''}`;
+    toast.innerHTML = `<div class="toast-title">${esc(title)}</div><div class="toast-text">${esc(text)}</div>`;
+    container.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300); }, 4000);
+}
 
-    function startDrag(e, windowElement) {
-        if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
-        
-        isDragging = true;
-        currentWindow = windowElement;
-        
-        // Bring window to front
-        highestZIndex++;
-        currentWindow.style.zIndex = highestZIndex;
-        
-        const rect = currentWindow.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        
-        e.preventDefault();
-        e.stopPropagation();
+// ======================== LOGIN ========================
+function doLogin(guest) {
+    const username = document.getElementById('loginUsername').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const color = document.getElementById('loginColor').value;
+    if (!guest && !username) { alert('Enter a username!'); return; }
+    if (!guest && username.length < 2) { alert('Username must be 2+ characters!'); return; }
+    socket.emit('user-login', { username, password, color, isGuest: guest });
+}
+
+// ======================== MESSAGES ========================
+function addMessage(username, text, color, timestamp, status, isHistory) {
+    const area = document.getElementById('messagesArea');
+    const div = document.createElement('div');
+    div.className = 'message message-new-group';
+
+    let msgHtml = esc(text);
+    if (currentUser && msgHtml.includes('@' + currentUser)) {
+        msgHtml = msgHtml.replace(new RegExp('@' + esc(currentUser), 'g'),
+            `<span class="mention">@${esc(currentUser)}</span>`);
     }
 
-    document.addEventListener('mousemove', (e) => {
-        if (isDragging && currentWindow) {
-            let newX = e.clientX - offsetX;
-            let newY = e.clientY - offsetY;
-            
-            // Keep window in bounds
-            const maxX = window.innerWidth - currentWindow.offsetWidth;
-            const maxY = window.innerHeight - currentWindow.offsetHeight - 40; // 40 for taskbar
-            
-            newX = Math.max(0, Math.min(newX, maxX));
-            newY = Math.max(0, Math.min(newY, maxY));
-            
-            currentWindow.style.left = newX + 'px';
-            currentWindow.style.top = newY + 'px';
-        }
+    div.innerHTML = `
+        <div class="msg-avatar" style="background:${color};">${getInitial(username)}</div>
+        <div class="msg-body">
+            <div class="msg-header">
+                <span class="msg-author" style="color:${color};" ondblclick="openPM('${esc(username)}')">${esc(username)}</span>
+                <span class="msg-time">${timestamp}</span>
+            </div>
+            <div class="msg-text">${msgHtml}</div>
+            <div class="msg-reactions">
+                <span class="reaction-chip" onclick="react(this)">👍 0</span>
+            </div>
+        </div>
+    `;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+    messageCount++;
+    if (!isHistory && username !== currentUser) showToast(username, text.substring(0,60));
+}
+
+function addSystemMsg(text) {
+    const area = document.getElementById('messagesArea');
+    const div = document.createElement('div');
+    div.className = 'msg-system';
+    div.innerHTML = `<div class="msg-system-dot"></div><div class="msg-system-text">${esc(text)}</div>`;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+}
+
+function addErrorMsg(text) {
+    const area = document.getElementById('messagesArea');
+    const div = document.createElement('div');
+    div.className = 'msg-error';
+    div.innerHTML = `⚠ ${esc(text)}`;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+}
+
+function addActionMsg(username, action, color, timestamp) {
+    const area = document.getElementById('messagesArea');
+    const div = document.createElement('div');
+    div.className = 'msg-action';
+    div.innerHTML = `<span class="msg-time">${timestamp}</span> <em style="color:${color};">★ ${esc(username)} ${esc(action)}</em>`;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+}
+
+function addImageMsg(username, src, color, timestamp) {
+    const area = document.getElementById('messagesArea');
+    const div = document.createElement('div');
+    div.className = 'message message-new-group';
+    div.innerHTML = `
+        <div class="msg-avatar" style="background:${color};">${getInitial(username)}</div>
+        <div class="msg-body">
+            <div class="msg-header">
+                <span class="msg-author" style="color:${color};">${esc(username)}</span>
+                <span class="msg-time">${timestamp}</span>
+            </div>
+            <img src="${src}" class="msg-image" onclick="window.open(this.src)" title="Click to view full size">
+        </div>
+    `;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+}
+
+function react(el) {
+    const m = el.textContent.match(/\d+/);
+    const c = m ? parseInt(m[0]) + 1 : 1;
+    el.textContent = `👍 ${c}`;
+    socket.emit('add-reaction', { messageId: Date.now(), reaction: 'thumbsup' });
+}
+
+// ======================== SEND ========================
+function sendMessage() {
+    const input = document.getElementById('msgInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    socket.emit('chat-message', { message: msg, timestamp: getTime() });
+    input.value = '';
+    socket.emit('stop-typing');
+}
+
+// ======================== ROOMS ========================
+function switchRoom(room) {
+    if (room === currentRoom) return;
+    const area = document.getElementById('messagesArea');
+    roomMessages[currentRoom] = area.innerHTML;
+    area.innerHTML = '';
+    document.querySelectorAll('.channel').forEach(c => {
+        c.classList.toggle('active', c.dataset.room === room);
     });
+    socket.emit('chat-message', { message: `/join ${room}`, timestamp: getTime() });
+}
 
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-        currentWindow = null;
-    });
+// ======================== MEMBERS ========================
+function updateMembers() {
+    const list = document.getElementById('membersList');
+    const online = users.filter(u => (u.status||'Online') === 'Online');
+    const away = users.filter(u => (u.status||'Online') === 'Away');
+    const busy = users.filter(u => (u.status||'Online') === 'Busy');
 
-    // ==================== GLOBAL FUNCTIONS ====================
-
-    // LOGIN FUNCTION
-    function login(guestMode) {
-        const username = document.getElementById('usernameInput').value.trim();
-        const password = document.getElementById('passwordInput').value;
-        const color = document.getElementById('userColor').value;
-
-        if (!guestMode && !username) {
-            alert('Please enter a username!');
-            return;
-        }
-
-        if (!guestMode && username.length < 2) {
-            alert('Username must be at least 2 characters!');
-            return;
-        }
-
-        isGuest = guestMode;
-        currentUser = username;
-        userColor = color;
-
-        socket.emit('user-login', {
-            username: username,
-            color: color,
-            password: password,
-            isGuest: guestMode
-        });
-
-        document.getElementById('loginWindow').classList.remove('active');
-        document.getElementById('chatWindow').classList.add('active');
+    let html = '';
+    if (online.length) {
+        html += `<div class="members-category">Online — ${online.length}</div>`;
+        online.forEach(u => html += memberHtml(u, 'var(--online)'));
     }
-
-    // SEND MESSAGE
-    function sendMessage() {
-        const input = document.getElementById('messageInput');
-        const message = input.value.trim();
-        if (!message) return;
-
-        const now = new Date();
-        const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-
-        setTimeout(() => {
-            socket.emit('chat-message', {
-                message: message,
-                timestamp: time
-            });
-        }, messageDelay);
-
-        input.value = '';
-        socket.emit('stop-typing');
+    if (away.length) {
+        html += `<div class="members-category">Away — ${away.length}</div>`;
+        away.forEach(u => html += memberHtml(u, 'var(--idle)'));
     }
-
-    // TRIGGER IMAGE UPLOAD
-    function triggerImageUpload() {
-        document.getElementById('imageInput').click();
+    if (busy.length) {
+        html += `<div class="members-category">Busy — ${busy.length}</div>`;
+        busy.forEach(u => html += memberHtml(u, 'var(--dnd)'));
     }
+    list.innerHTML = html;
+}
 
-    // SWITCH ROOM
-    function switchRoom(room) {
-        if (room === currentRoom) return;
+function memberHtml(u, dotColor) {
+    const name = u.username || u;
+    const color = u.color || 'var(--accent)';
+    return `<div class="member-item" ondblclick="openPM('${esc(name)}')">
+        <div class="member-avatar" style="background:${color};">
+            ${getInitial(name)}
+            <div class="member-status-dot" style="background:${dotColor};"></div>
+        </div>
+        <div class="member-name">${esc(name)}</div>
+    </div>`;
+}
 
-            // Save current room messages
-            const messagesArea = document.getElementById('messagesArea');
-            if (messagesArea) {
-                roomMessages[currentRoom] = messagesArea.innerHTML;
-                console.log('Saved messages for room:', currentRoom);
-            }
-        
-        socket.emit('chat-message', {
-            message: `/join ${room}`,
-            timestamp: getCurrentTime()
-        });
-        
-        // Update UI
-        document.querySelectorAll('.room-tab').forEach(tab => {
-            tab.classList.remove('active');
-            if (tab.getAttribute('data-room') === room) {
-                tab.classList.add('active');
-            }
-        });
-        
-        currentRoom = room;
-        document.getElementById('currentRoom').textContent = room;
-        document.getElementById('roomInfo').textContent = `Room: #${room}`;
+function toggleMembers() {
+    const s = document.getElementById('membersSidebar');
+    s.classList.toggle('hidden');
+    membersVisible = !membersVisible;
+}
+
+// ======================== PM ========================
+function openPM(username) {
+    if (username === currentUser) return;
+    pmTarget = username;
+    document.getElementById('pmTargetName').textContent = username;
+    document.getElementById('pmMessages').innerHTML = '';
+    document.getElementById('pmOverlay').classList.add('active');
+    document.getElementById('pmInput').focus();
+}
+function closePM() { document.getElementById('pmOverlay').classList.remove('active'); }
+function sendPM() {
+    const input = document.getElementById('pmInput');
+    const msg = input.value.trim();
+    if (!msg || !pmTarget) return;
+    socket.emit('chat-message', { message: `/msg ${pmTarget} ${msg}`, timestamp: getTime() });
+    const box = document.getElementById('pmMessages');
+    box.innerHTML += `<div class="pm-msg"><strong style="color:${userColor};">You:</strong> ${esc(msg)}</div>`;
+    box.scrollTop = box.scrollHeight;
+    input.value = '';
+}
+
+// ======================== SETTINGS ========================
+function openSettings() {
+    document.getElementById('setUsername').value = currentUser;
+    document.getElementById('setColor').value = userColor;
+    buildThemeGrid();
+    renderAchievements();
+    document.getElementById('settingsOverlay').classList.add('active');
+}
+function closeSettings() { document.getElementById('settingsOverlay').classList.remove('active'); }
+
+function switchTab(id) {
+    document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelector(`.modal-tab[onclick="switchTab('${id}')"]`).classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+}
+
+function saveProfile() {
+    const newColor = document.getElementById('setColor').value;
+    if (newColor !== userColor) {
+        socket.emit('chat-message', { message: `/color ${newColor}`, timestamp: getTime() });
     }
-
-    // SHOW WINDOWS
-    function showAbout() { 
-        closeAllDropdowns();
-        document.getElementById('aboutWindow').classList.add('active'); 
+    const newStatus = document.getElementById('setStatus').value;
+    if (newStatus !== userStatus) {
+        userStatus = newStatus;
+        socket.emit('chat-message', { message: `/status ${newStatus}`, timestamp: getTime() });
+        document.getElementById('myStatus').textContent = newStatus;
     }
-    
-    function showSettings() {
-        closeAllDropdowns();
-        document.getElementById('settingsWindow').classList.add('active');
-        document.getElementById('settingsColor').value = userColor;
-        document.getElementById('settingsUsername').value = currentUser;
-    }
+    showToast('Settings', 'Profile saved!');
+    closeSettings();
+}
 
-    function showAchievements() {
-        closeAllDropdowns();
-        updateAchievementsList();
-        document.getElementById('achievementsWindow').classList.add('active');
-    }
+function renderAchievements() {
+    const list = document.getElementById('achList');
+    list.innerHTML = ALL_ACHIEVEMENTS.map(a => {
+        const unlocked = achievements.includes(a.id);
+        return `<div class="ach-item ${unlocked ? '' : 'locked'}">
+            <div class="ach-icon">${a.icon}</div>
+            <div class="ach-info">
+                <div class="ach-title">${unlocked ? '✓' : '?'} ${a.title}</div>
+                <div class="ach-desc">${a.desc}</div>
+            </div>
+        </div>`;
+    }).join('');
+}
 
-    function showHelp() {
-        closeAllDropdowns();
-        document.getElementById('helpWindow').classList.add('active');
-    }
-    
-    function closeWindow(id) { 
-        document.getElementById(id).classList.remove('active'); 
-    }
-    
-    function minimizeWindow(id) { 
-        document.getElementById(id).classList.remove('active'); 
-    }
-    
-    function focusWindow(id) { 
-        const win = document.getElementById(id);
-        win.classList.add('active');
-        highestZIndex++;
-        win.style.zIndex = highestZIndex;
-    }
-    
-    function openChatWindow() { 
-        focusWindow('chatWindow');
-    }
+// ======================== MISC ========================
+function downloadLog() {
+    const text = document.getElementById('messagesArea').innerText;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `arabiac-${currentRoom}-${Date.now()}.txt`;
+    a.click();
+    showToast('Download', 'Chat log saved!');
+}
 
-    // TOGGLE START MENU
-    function toggleStartMenu() {
-        const menu = document.getElementById('startMenu');
-        menu.classList.toggle('show');
-    }
+function updateUI() {
+    document.getElementById('myName').textContent = currentUser;
+    document.getElementById('myAvatar').textContent = getInitial(currentUser);
+    document.getElementById('myAvatar').style.background = userColor;
+}
 
-    // TOGGLE DROPDOWN
-    function toggleDropdown(id) {
-        const dropdown = document.getElementById(id);
-        document.querySelectorAll('.dropdown').forEach(d => {
-            if (d.id !== id) d.classList.remove('show');
-        });
-        dropdown.classList.toggle('show');
-    }
+// ======================== IMAGE UPLOAD ========================
+document.addEventListener('DOMContentLoaded', () => {
+    // Load saved theme
+    const saved = localStorage.getItem('arabiac-theme');
+    if (saved && THEMES[saved]) applyTheme(saved);
 
-    function closeAllDropdowns() {
-        document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
-    }
-
-    // UPDATE BORDER COLOR
-    function updateBorderColor(color) {
-        document.querySelectorAll('.title-bar').forEach(bar => {
-            bar.style.background = `linear-gradient(to right, ${color}, ${adjustColor(color, 30)})`;
-        });
-    }
-
-    // ADJUST COLOR HELPER
-    function adjustColor(color, percent) {
-        const num = parseInt(color.replace("#", ""), 16);
-        const amt = Math.round(2.55 * percent);
-        const R = (num >> 16) + amt;
-        const G = (num >> 8 & 0x00FF) + amt;
-        const B = (num & 0x0000FF) + amt;
-        return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 1 ? 0 : B : 255))
-            .toString(16).slice(1);
-    }
-
-    // SAVE SETTINGS
-    function saveSettings() {
-        const newColor = document.getElementById('settingsColor').value;
-        if (newColor !== userColor) {
-            userColor = newColor;
-            socket.emit('chat-message', {
-                message: `/color ${newColor}`,
-                timestamp: getCurrentTime()
-            });
-        }
-        
-        const borderColor = document.getElementById('borderColor').value;
-        updateBorderColor(borderColor);
-        
-        const newStatus = document.getElementById('statusSelect').value;
-        if (newStatus !== userStatus) {
-            userStatus = newStatus;
-            socket.emit('chat-message', {
-                message: `/status ${newStatus}`,
-                timestamp: getCurrentTime()
-            });
-        }
-        
-        pixelationLevel = parseInt(document.getElementById('pixelLevel').value);
-        messageDelay = parseInt(document.getElementById('messageDelay').value);
-        
-        const crtEnabled = document.getElementById('crtToggle').checked;
-        if (crtEnabled) {
-            document.body.classList.add('crt-mode');
-        } else {
-            document.body.classList.remove('crt-mode');
-        }
-        
-        alert('Settings saved successfully!');
-        closeWindow('settingsWindow');
-    }
-
-    // CLEAR CHAT
-    function clearChat() {
-        closeAllDropdowns();
-        if (confirm('Clear your local chat history? (This only clears YOUR view)')) {
-            socket.emit('chat-message', {
-                message: '/clear',
-                timestamp: getCurrentTime()
-            });
-        }
-    }
-
-    // DOWNLOAD CHAT LOG
-    function downloadChatLog() {
-        closeAllDropdowns();
-        const messagesArea = document.getElementById('messagesArea');
-        const text = messagesArea.innerText;
-        const blob = new Blob([text], { type: 'text/plain' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `retrochat95-log-${Date.now()}.txt`;
-        a.click();
-        showNotification('Chat log downloaded!');
-    }
-
-    // TOGGLE CRT MODE
-    function toggleCRTMode() {
-        document.body.classList.toggle('crt-mode');
-        const isOn = document.body.classList.contains('crt-mode');
-        document.getElementById('crtToggle').checked = isOn;
-    }
-
-    // UPDATE ACHIEVEMENTS LIST
-    function updateAchievementsList() {
-        const list = document.getElementById('achievementsList');
-        list.innerHTML = '';
-        
-        if (allAchievements.length === 0) {
-            list.innerHTML = '<p style="text-align: center; color: #808080;">No achievements yet!</p>';
-            return;
-        }
-        
-        allAchievements.forEach(ach => {
-            const unlocked = achievements.includes(ach.id);
-            const item = document.createElement('div');
-            item.className = `achievement-item ${unlocked ? '' : 'locked'}`;
-            item.innerHTML = `
-                <div class="achievement-item-title">${unlocked ? '[!]' : '[?]'} ${ach.title}</div>
-                <div class="achievement-item-desc">${ach.desc}</div>
-            `;
-            list.appendChild(item);
-        });
-    }
-
-    // SEND PM
-    function sendPM() {
-        const input = document.getElementById('pmInput');
-        const message = input.value.trim();
-        if (!message || !pmTarget) return;
-
-        socket.emit('chat-message', {
-            message: `/msg ${pmTarget} ${message}`,
-            timestamp: getCurrentTime()
-        });
-
-        // Add to PM window
-        const pmMessages = document.getElementById('pmMessages');
-        const msgDiv = document.createElement('div');
-        msgDiv.style.marginBottom = '5px';
-        msgDiv.innerHTML = `<strong>You:</strong> ${escapeHtml(message)}`;
-        pmMessages.appendChild(msgDiv);
-        pmMessages.scrollTop = pmMessages.scrollHeight;
-
-        input.value = '';
-    }
-
-    // SHOW PM WINDOW
-    function showPMWindow(username) {
-        pmTarget = username;
-        document.getElementById('pmTarget').textContent = username;
-        document.getElementById('pmMessages').innerHTML = '';
-        document.getElementById('pmWindow').classList.add('active');
-    }
-
-    // WIN95 ERROR
-    function closeWin95Error() {
-        document.getElementById('win95Error').classList.remove('show');
-    }
-
-    // ESCAPE HTML
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // GET CURRENT TIME
-    function getCurrentTime() {
-        const now = new Date();
-        return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    }
-
-    // ==================== DOM READY ====================
-    document.addEventListener("DOMContentLoaded", () => {
-
-        // CLOCK
-        function updateClock() {
-            const now = new Date();
-            const hours = now.getHours() % 12 || 12;
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-            document.getElementById('clock').textContent = `${hours}:${minutes} ${ampm}`;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // SLIDERS
-        document.getElementById('messageDelay').addEventListener('input', function(e) {
-            document.getElementById('delayValue').textContent = e.target.value;
-        });
-
-        document.getElementById('pixelLevel').addEventListener('input', function(e) {
-            document.getElementById('pixelValue').textContent = e.target.value;
-            pixelationLevel = parseInt(e.target.value);
-        });
-
-        // ADD MESSAGE FUNCTION
-        function addMessage(username, text, color, timestamp, status = 'Online', isHistory = false) {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message';
-
-            const statusDot = status === 'Online' ? '&#9679;' : status === 'Away' ? '&#9711;' : '&#9679;';
-            const statusColor = status === 'Online' ? '#00ff00' : status === 'Away' ? '#ffff00' : '#ff0000';
-
-            // Highlight @mentions
-            let messageText = escapeHtml(text);
-            if (messageText.includes('@' + currentUser)) {
-                messageText = messageText.replace(
-                    new RegExp('@' + escapeHtml(currentUser), 'g'), 
-                    `<span class="message-highlight">@${escapeHtml(currentUser)}</span>`
-                );
-            }
-
-            messageDiv.innerHTML = `
-                <div class="message-header">
-                    <span style="color: ${statusColor};">${statusDot}</span>
-                    <span style="color: ${color};">${escapeHtml(username)}</span>
-                    <span class="timestamp">[${timestamp}]</span>
-                    <button class="reaction-button" onclick="reactToMessage(this)">+1 (0)</button>
-                </div>
-                <div class="message-content">${messageText}</div>
-            `;
-
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-
-            messageCount++;
-            document.getElementById('messageCount').textContent = `Messages: ${messageCount}`;
-
-            if (!isHistory && username !== currentUser) {
-                showNotification(`${username}: ${text.substring(0, 40)}...`);
-            }
-        }
-        window.addMessage = addMessage;
-
-        // REACT TO MESSAGE
-        window.reactToMessage = function(button) {
-            const match = button.textContent.match(/\d+/);
-            const currentCount = match ? parseInt(match[0]) : 0;
-            button.textContent = `+1 (${currentCount + 1})`;
-            socket.emit('add-reaction', {
-                messageId: Date.now(),
-                reaction: 'thumbsup'
-            });
+    document.getElementById('fileInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { alert('Max 5MB!'); return; }
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            socket.emit('image-upload', { imageData: ev.target.result, timestamp: getTime() });
         };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+    });
 
-        // ADD SYSTEM MESSAGE
-        function addSystemMessage(text) {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message message-system';
-            messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-        }
-        window.addSystemMessage = addSystemMessage;
+    // Enter to send
+    document.getElementById('msgInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); sendMessage(); }
+    });
+    document.getElementById('pmInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); sendPM(); }
+    });
 
-        // ADD ERROR MESSAGE
-        function addErrorMessage(text) {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message message-error';
-            messageDiv.innerHTML = `<div class="message-content">[ERROR] ${escapeHtml(text)}</div>`;
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-        }
-        window.addErrorMessage = addErrorMessage;
+    // Typing indicator
+    document.getElementById('msgInput').addEventListener('input', () => {
+        socket.emit('typing');
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => socket.emit('stop-typing'), 1000);
+    });
 
-        // ADD ACTION MESSAGE
-        function addActionMessage(username, action, color, timestamp) {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message message-action';
-            messageDiv.innerHTML = `
-                <div class="message-content">
-                    <span class="timestamp">[${timestamp}]</span>
-                    <em style="color: ${color};">* ${escapeHtml(username)} ${escapeHtml(action)}</em>
-                </div>
-            `;
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-        }
+    // Close modals on overlay click
+    document.getElementById('settingsOverlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeSettings();
+    });
+    document.getElementById('pmOverlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closePM();
+    });
 
-        // ADD IMAGE MESSAGE
-        function addImageMessage(username, imageData, color, timestamp) {
-            const messagesArea = document.getElementById('messagesArea');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message';
-            messageDiv.innerHTML = `
-                <div class="message-header">
-                    <span style="color: ${color};">${escapeHtml(username)}</span>
-                    <span class="timestamp">[${timestamp}]</span>
-                </div>
-                <div class="message-content">
-                    <img src="${imageData}" class="message-image" onclick="window.open(this.src)" title="Click to view full size">
-                </div>
-            `;
-            messagesArea.appendChild(messageDiv);
-            messagesArea.scrollTop = messagesArea.scrollHeight;
-            messageCount++;
-            document.getElementById('messageCount').textContent = `Messages: ${messageCount}`;
-        }
+    // ======================== SOCKET EVENTS ========================
+    socket.on('connect', () => {
+        document.getElementById('connDot').style.background = 'var(--online)';
+    });
+    socket.on('disconnect', () => {
+        document.getElementById('connDot').style.background = 'var(--dnd)';
+    });
 
-        // HANDLE IMAGE UPLOAD
-        document.getElementById('imageInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+    socket.on('login-success', (data) => {
+        currentUser = data.username;
+        userColor = data.color;
+        isGuest = data.isGuest;
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('app').classList.add('active');
+        updateUI();
+    });
 
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Image is too large! Maximum size is 5MB.');
-                return;
-            }
+    socket.on('login-error', (msg) => {
+        alert('Login Error: ' + msg);
+    });
 
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                pixelateImage(e.target.result);
-            };
-            reader.readAsDataURL(file);
-        });
+    socket.on('chat-message', (data) => {
+        addMessage(data.username, data.message, data.color, data.timestamp, data.status, false);
+    });
 
-        function pixelateImage(imageData) {
-            const canvas = document.getElementById('pixelCanvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
+    socket.on('image-message', (data) => {
+        addImageMsg(data.username, data.imageData, data.color, data.timestamp);
+    });
 
-            img.onload = function () {
-                const maxWidth = 500;
-                const maxHeight = 500;
-                let width = img.width;
-                let height = img.height;
+    socket.on('image-keyword', (data) => {
+        addImageMsg(data.username, data.imageUrl, data.color, data.timestamp);
+    });
 
-                if (width > maxWidth) {
-                    height = (maxWidth / width) * height;
-                    width = maxWidth;
-                }
-                if (height > maxHeight) {
-                    width = (maxHeight / height) * width;
-                    height = maxHeight;
-                }
+    socket.on('action-message', (data) => {
+        addActionMsg(data.username, data.action, data.color, data.timestamp);
+    });
 
-                const pixelSize = pixelationLevel * 2;
-                const smallWidth = Math.ceil(width / pixelSize);
-                const smallHeight = Math.ceil(height / pixelSize);
+    socket.on('system-message', (data) => {
+        addSystemMsg(data.text);
+    });
 
-                canvas.width = smallWidth;
-                canvas.height = smallHeight;
-                ctx.drawImage(img, 0, 0, smallWidth, smallHeight);
+    socket.on('user-joined', (data) => {
+        addSystemMsg(`${data.username} joined the channel`);
+    });
 
-                const pixelatedData = canvas.toDataURL('image/png');
+    socket.on('user-left', (data) => {
+        addSystemMsg(`${data.username} left the channel`);
+    });
 
-                socket.emit('image-upload', {
-                    imageData: pixelatedData,
-                    timestamp: getCurrentTime()
-                });
-            };
+    socket.on('users-update', (list) => {
+        users = list;
+        updateMembers();
+    });
 
-            img.src = imageData;
-        }
+    socket.on('user-typing', (data) => {
+        document.getElementById('typingIndicator').textContent = `${data.username} is typing...`;
+    });
 
-        // CLOSE MENUS
-        document.addEventListener('click', function (e) {
-            if (!e.target.closest('.menu-item')) {
-                document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
-            }
-            if (!e.target.closest('.start-menu') && !e.target.closest('.start-button')) {
-                document.getElementById('startMenu').classList.remove('show');
-            }
-        });
+    socket.on('user-stop-typing', () => {
+        document.getElementById('typingIndicator').textContent = '';
+    });
 
-        // UPDATE USERS LIST
-        function updateUsersList() {
-            const usersList = document.getElementById('usersList');
-            usersList.innerHTML = users.map(u => `
-                <div class="user-item">
-                    <div class="user-status online"></div>
-                    ${escapeHtml(u)}
-                </div>
-            `).join('');
-            document.getElementById('userCount').textContent = `Users: ${users.length}`;
-        }
-        window.updateUsersList = updateUsersList;
-
-        // SHOW NOTIFICATION
-        function showNotification(text) {
-            const notif = document.getElementById('notification');
-            if (!document.getElementById('notifToggle').checked) return;
-            document.getElementById('notificationText').textContent = text;
-            notif.classList.add('show');
-            setTimeout(() => notif.classList.remove('show'), 3000);
-        }
-        window.showNotification = showNotification;
-
-        // ACHIEVEMENT POPUP
-        function showAchievement(title, desc) {
-            const popup = document.getElementById('achievementPopup');
-            document.getElementById('achievementDesc').textContent = `${title} - ${desc}`;
-            popup.classList.add('show');
-            setTimeout(() => popup.classList.remove('show'), 5000);
-        }
-        window.showAchievement = showAchievement;
-
-        // ENTER TO SEND
-        document.getElementById('messageInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
-        // PM ENTER TO SEND
-        document.getElementById('pmInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                sendPM();
-            }
-        });
-
-        // TYPING INDICATOR
-        document.getElementById('messageInput').addEventListener('input', function() {
-            socket.emit('typing');
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => {
-                socket.emit('stop-typing');
-            }, 1000);
-        });
-
-        updateUsersList();
-
-        // ==================== SOCKET.IO EVENTS ====================
-
-        socket.on('connect', () => {
-            console.log('[Connected] Socket.IO connected');
-            document.getElementById('statusText').textContent = 'Connected';
-            document.getElementById('statusText').style.color = '#00ff00';
-        });
-
-        socket.on('disconnect', () => {
-            console.log('[Disconnected] Socket.IO disconnected');
-            document.getElementById('statusText').textContent = 'Disconnected';
-            document.getElementById('statusText').style.color = '#ff0000';
-        });
-
-        socket.on('connect_error', (error) => {
-            console.error('[Connection Error]', error);
-            document.getElementById('statusText').textContent = 'Connection Error';
-            document.getElementById('statusText').style.color = '#ff0000';
-        });
-
-        socket.on('chat-message', data => {
-            addMessage(data.username, data.message, data.color, data.timestamp, data.status);
-        });
-        
-        socket.on('image-message', data => {
-            addImageMessage(data.username, data.imageData, data.color, data.timestamp);
-        });
-
-        socket.on('image-keyword', data => {
-            addImageMessage(data.username, data.imageUrl, data.color, data.timestamp);
-        });
-
-        socket.on('action-message', data => {
-            addActionMessage(data.username, data.action, data.color, data.timestamp);
-        });
-
-        socket.on('system-message', data => {
-            addSystemMessage(data.text);
-        });
-
-        socket.on('user-joined', data => {
-            addSystemMessage(`${data.username} has entered the chat.`);
-        });
-
-        socket.on('user-left', data => {
-            addSystemMessage(`${data.username} has left the chat.`);
-        });
-
-        socket.on('users-update', list => { 
-            users = list; 
-            updateUsersList(); 
-        });
-
-        socket.on('user-typing', data => {
-            document.getElementById('typingIndicator').textContent = `${data.username} is typing...`;
-        });
-
-        socket.on('user-stop-typing', () => {
-            document.getElementById('typingIndicator').textContent = '';
-        });
-
-        socket.on('achievement-unlocked', data => {
-            if (!achievements.includes(data.title.toLowerCase().replace(/ /g, '-').replace(/!/g, ''))) {
-                achievements.push(data.title.toLowerCase().replace(/ /g, '-').replace(/!/g, ''));
-            }
-            showAchievement(data.title, data.description);
-            updateAchievementsList();
-        });
-
-        socket.on('achievements-update', data => {
-            achievements = data || [];
-            updateAchievementsList();
-        });
-
-        socket.on('win95-error', message => {
-            document.getElementById('errorMessage').textContent = message;
-            document.getElementById('win95Error').classList.add('show');
-            setTimeout(() => closeWin95Error(), 5000);
-        });
-
-        socket.on('color-changed', color => {
-            userColor = color;
-            document.getElementById('settingsColor').value = color;
-        });
-
-        socket.on('clear-chat', () => {
-            document.getElementById('messagesArea').innerHTML = '';
-            addSystemMessage('Chat cleared.');
-            messageCount = 0;
-        });
-
-    socket.on('room-changed', room => {
-        console.log('Room changed to:', room);
+    socket.on('room-changed', (room) => {
         currentRoom = room;
-        document.getElementById('currentRoom').textContent = room;
-        document.getElementById('roomInfo').textContent = `Room: #${room}`;
-        
-        const messagesArea = document.getElementById('messagesArea');
-        
-        // Restore saved messages for this room
-        if (roomMessages[room] && roomMessages[room].length > 0) {
-            console.log('Restoring saved messages for:', room);
-            messagesArea.innerHTML = roomMessages[room];
-        } else {
-            console.log('No saved messages for:', room, '- clearing');
-            messagesArea.innerHTML = '';
-            addSystemMessage(`Joined room: #${room}`);
-        }
-        
+        document.getElementById('headerChannel').textContent = room;
+        document.getElementById('headerTopic').textContent = ROOM_TOPICS[room] || '';
+        document.getElementById('msgInput').placeholder = `Message #${room}`;
+        document.querySelectorAll('.channel').forEach(c => {
+            c.classList.toggle('active', c.dataset.room === room);
+        });
         messageCount = 0;
-        messagesArea.scrollTop = messagesArea.scrollHeight;
     });
 
-        socket.on('private-message', data => {
-            showPMWindow(data.from);
-            const pmMessages = document.getElementById('pmMessages');
-            const msgDiv = document.createElement('div');
-            msgDiv.style.marginBottom = '5px';
-            msgDiv.innerHTML = `<strong style="color: ${data.color};">${escapeHtml(data.from)}:</strong> ${escapeHtml(data.message)}`;
-            pmMessages.appendChild(msgDiv);
-            pmMessages.scrollTop = pmMessages.scrollHeight;
-            showNotification(`PM from ${data.from}: ${data.message}`);
-        });
-
-        socket.on('private-message-sent', data => {
-            showNotification(`PM sent to ${data.to}`);
-        });
-
-        socket.on('message-blocked', message => {
-            addErrorMessage(message);
-        });
-
-        socket.on('command-error', message => {
-            addErrorMessage(message);
-        });
-
-        socket.on('login-error', message => {
-            alert('Login Error: ' + message);
-            document.getElementById('loginWindow').classList.add('active');
-            document.getElementById('chatWindow').classList.remove('active');
-        });
-
-        socket.on('message-history', messages => {
-            if (!messages || messages.length === 0) return;
-            
-            messages.forEach(msg => {
-                if (msg.message_type === 'normal') {
-                    addMessage(msg.username, msg.message, msg.color, msg.timestamp, 'Online', true);
-                } else if (msg.message_type === 'action') {
-                    addActionMessage(msg.username, msg.message, msg.color, msg.timestamp);
-                } else if (msg.message_type === 'image') {
-                    addSystemMessage(`${msg.username} posted an image: ${msg.message}`);
-                }
-            });
-            
-            addSystemMessage('--- End of message history ---');
-
-        // Save this room's messages after loading history
-        const messagesArea = document.getElementById('messagesArea');
-        if (messagesArea) {
-            roomMessages[currentRoom] = messagesArea.innerHTML;
-            console.log('Saved history for room:', currentRoom);
+    socket.on('message-history', (messages) => {
+        const area = document.getElementById('messagesArea');
+        area.innerHTML = '';
+        if (!messages || !messages.length) {
+            addSystemMsg(`Welcome to #${currentRoom}!`);
+            return;
         }
+        messages.forEach(m => {
+            if (m.message_type === 'normal') addMessage(m.username, m.message, m.color, m.timestamp, 'Online', true);
+            else if (m.message_type === 'action') addActionMsg(m.username, m.message, m.color, m.timestamp);
+            else if (m.message_type === 'image') addSystemMsg(`${m.username} shared an image`);
         });
-
-        socket.on('reaction-added', data => {
-            // Handle reaction updates if needed
-        });
-
+        roomMessages[currentRoom] = area.innerHTML;
     });
+
+    socket.on('color-changed', (color) => {
+        userColor = color;
+        updateUI();
+    });
+
+    socket.on('clear-chat', () => {
+        document.getElementById('messagesArea').innerHTML = '';
+        addSystemMsg('Chat cleared.');
+        messageCount = 0;
+    });
+
+    socket.on('private-message', (data) => {
+        openPM(data.from);
+        const box = document.getElementById('pmMessages');
+        box.innerHTML += `<div class="pm-msg"><strong style="color:${data.color};">${esc(data.from)}:</strong> ${esc(data.message)}</div>`;
+        box.scrollTop = box.scrollHeight;
+        if (document.getElementById('setPmNotifs').checked) {
+            showToast(`PM from ${data.from}`, data.message);
+        }
+    });
+
+    socket.on('private-message-sent', (data) => {
+        showToast('PM Sent', `Message sent to ${data.to}`);
+    });
+
+    socket.on('message-blocked', (msg) => addErrorMsg(msg));
+    socket.on('command-error', (msg) => addErrorMsg(msg));
+
+    socket.on('achievement-unlocked', (data) => {
+        const id = data.title.toLowerCase().replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-');
+        if (!achievements.includes(id)) achievements.push(id);
+        showToast('🏆 Achievement Unlocked!', `${data.title} — ${data.description}`, 'achievement');
+        renderAchievements();
+    });
+
+    socket.on('achievements-update', (data) => {
+        achievements = data || [];
+        renderAchievements();
+    });
+
+    socket.on('reaction-added', () => {});
+});
 </script>
 </body>
 </html>
